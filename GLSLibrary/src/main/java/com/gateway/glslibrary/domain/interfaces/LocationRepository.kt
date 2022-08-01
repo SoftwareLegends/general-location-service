@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface LocationRepository {
     fun lastLocation() : Flow<Resource<Location>>
     fun getCurrentLocation() : Flow<Resource<Location>>
+    val isLocationServicesAvailable: Boolean
 }
