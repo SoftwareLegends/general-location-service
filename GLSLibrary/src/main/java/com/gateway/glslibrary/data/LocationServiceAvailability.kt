@@ -10,6 +10,9 @@ object LocationServiceAvailability {
 
     fun isLocationServicesAvailable() = with(LocationServiceModule) {
         when (ConnectionResult.SUCCESS) {
+            googleApiAvailability.isGooglePlayServicesAvailable(application) -> setServiceProvider(
+                service = Services.Google
+            )
             huaweiApiAvailability.isHuaweiMobileServicesAvailable(application) -> setServiceProvider(
                 service = Services.Huawei
             )
