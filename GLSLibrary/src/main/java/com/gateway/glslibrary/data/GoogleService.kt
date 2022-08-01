@@ -7,16 +7,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.glslibrary.domain.Resource
 import com.gateway.glslibrary.domain.interfaces.LocationService
-import com.gateway.glslibrary.utils.LocationRequestProvider
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 class GoogleService(
     private val context: Context,
     private val fusedLocationClient: FusedLocationProviderClient,
-    private val locationRequest: LocationRequest = LocationRequestProvider.Google.locationRequest
+    private val locationRequest: LocationRequest
 ) : LocationService {
     override suspend fun lastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()

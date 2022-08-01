@@ -1,10 +1,7 @@
 plugins {
     id 'com.android.library'
-    id 'com.huawei.agconnect'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    id 'dagger.hilt.android.plugin'
-    id 'com.google.gms.google-services'
 }
 
 android {
@@ -42,15 +39,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     // Google
-    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation "com.google.android.gms:play-services-location:$gms_location_version"
 
     // Huawei
-    implementation 'com.huawei.hms:location:5.1.0.303'
-
-    // Hilt
-    kapt "androidx.hilt:hilt-compiler:$hilt_version"
-    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
-    implementation "com.google.dagger:hilt-android:$hilt_version"
+    implementation "com.huawei.hms:location:$hms_location_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
