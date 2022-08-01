@@ -4,6 +4,10 @@ buildscript {
         timber_version = '5.0.1'
         gson_version = '2.9.0'
         hilt_version = '2.43.1'
+        gms_service_version = '4.3.13'
+        gms_location_version = '20.0.0'
+        hms_service_version = '1.6.0.300'
+        hms_location_version = '6.4.0.300'
     }
     repositories {
         google()
@@ -11,8 +15,8 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:7.0.4"
-        classpath 'com.huawei.agconnect:agcp:1.5.1.300'
-        classpath 'com.google.gms:google-services:4.3.13'
+        classpath "com.huawei.agconnect:agcp:$hms_service_version"
+        classpath "com.google.gms:google-services:$gms_service_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
         classpath "com.google.dagger:hilt-android-gradle-plugin:$hilt_version"
     }

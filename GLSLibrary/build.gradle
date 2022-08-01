@@ -42,10 +42,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4'
 
     // Google
-    implementation 'com.google.android.gms:play-services-location:20.0.0'
+    implementation "com.google.android.gms:play-services-location:$gms_location_version"
 
     // Huawei
-    implementation 'com.huawei.hms:location:5.1.0.303'
+    implementation "com.huawei.hms:location:$hms_location_version"
 
     // Hilt
     kapt "androidx.hilt:hilt-compiler:$hilt_version"
