@@ -7,16 +7,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.glslibrary.domain.Resource
 import com.gateway.glslibrary.domain.interfaces.LocationService
-import com.gateway.glslibrary.utils.LocationRequestProvider
 import com.gateway.glslibrary.utils.extenstions.await
 import com.huawei.hms.common.ResolvableApiException
-import com.huawei.hms.location.*
+import com.huawei.hms.location.FusedLocationProviderClient
+import com.huawei.hms.location.LocationRequest
+import com.huawei.hms.location.LocationServices
+import com.huawei.hms.location.LocationSettingsRequest
 import timber.log.Timber
 
 class HuaweiService(
     private val context: Context,
     private val fusedLocationClient: FusedLocationProviderClient,
-    private val locationRequest: LocationRequest = LocationRequestProvider.Huawei.locationRequest
+    private val locationRequest: LocationRequest
 ) : LocationService {
     override suspend fun lastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()
