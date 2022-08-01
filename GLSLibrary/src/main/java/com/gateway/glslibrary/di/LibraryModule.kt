@@ -1,6 +1,7 @@
 package com.gateway.glslibrary.di
 
 import android.app.Application
+import com.gateway.glslibrary.data.LocationServiceAvailability
 
 object LibraryModule {
     @Volatile
@@ -13,8 +14,10 @@ object LibraryModule {
      *
      * @author Ahmed Mones
      */
-    fun initializeDI(application: Application) {
-        if (this::application.isInitialized.not())
+    fun initializeService(application: Application) {
+        if (this::application.isInitialized.not()) {
             synchronized(this.application) { this.application = application }
+            LocationServiceAvailability.initializeService()
+        }
     }
 }
