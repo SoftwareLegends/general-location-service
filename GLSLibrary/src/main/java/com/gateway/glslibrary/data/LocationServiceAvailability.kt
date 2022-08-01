@@ -4,6 +4,7 @@ import com.gateway.glslibrary.di.LibraryModule.application
 import com.gateway.glslibrary.di.LocationServiceModule
 import com.gateway.glslibrary.domain.Services
 import com.google.android.gms.common.ConnectionResult
+import timber.log.Timber
 
 object LocationServiceAvailability {
     var serviceProvider: Services = Services.None
@@ -23,5 +24,8 @@ object LocationServiceAvailability {
         }
     }
 
-    private fun setServiceProvider(service: Services) = true.also { serviceProvider = service }
+    private fun setServiceProvider(service: Services) = true.also {
+        Timber.d(service::class.java.name.substringAfter('$'))
+        serviceProvider = service
+    }
 }

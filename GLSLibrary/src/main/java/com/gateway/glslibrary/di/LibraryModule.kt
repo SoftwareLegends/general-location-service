@@ -16,7 +16,7 @@ object LibraryModule {
      */
     fun initializeService(application: Application) {
         if (this::application.isInitialized.not()) {
-            synchronized(this.application) { this.application = application }
+            synchronized(application) { this.application = application }
             LocationServiceAvailability.initializeService()
         }
     }
