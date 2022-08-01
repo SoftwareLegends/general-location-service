@@ -7,16 +7,19 @@ import com.google.android.gms.common.ConnectionResult
 
 object LocationServiceAvailability {
     var serviceProvider: Services = Services.None
+    var isLocationServicesAvailable: Boolean = false
 
-    fun isLocationServicesAvailable() = with(LocationServiceModule) {
-        when (ConnectionResult.SUCCESS) {
-            googleApiAvailability.isGooglePlayServicesAvailable(application) -> setServiceProvider(
-                service = Services.Google
-            )
-            huaweiApiAvailability.isHuaweiMobileServicesAvailable(application) -> setServiceProvider(
-                service = Services.Huawei
-            )
-            else -> false
+    fun initializeService() {
+        isLocationServicesAvailable = with(LocationServiceModule) {
+            when (ConnectionResult.SUCCESS) {
+                googleApiAvailability.isGooglePlayServicesAvailable(application) -> setServiceProvider(
+                    service = Services.Google
+                )
+                huaweiApiAvailability.isHuaweiMobileServicesAvailable(application) -> setServiceProvider(
+                    service = Services.Huawei
+                )
+                else -> false
+            }
         }
     }
 
