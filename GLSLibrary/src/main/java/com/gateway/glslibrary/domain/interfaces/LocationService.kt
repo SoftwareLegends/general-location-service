@@ -11,6 +11,7 @@ import com.gateway.glslibrary.domain.models.Error
 import com.gateway.glslibrary.utils.enums.LocationFailure
 import com.gateway.glslibrary.utils.extenstions.isGpsProviderEnabled
 import com.gateway.glslibrary.utils.extenstions.toModel
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 
@@ -21,7 +22,7 @@ interface LocationService {
     )
     suspend fun lastLocation(): Resource<Location>
 
-    suspend fun getCurrentLocation(): Resource<Location>
+    fun requestLocationUpdates() : Flow<Resource<Location>>
 
     fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)
 
