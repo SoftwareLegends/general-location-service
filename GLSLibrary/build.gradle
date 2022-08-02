@@ -2,7 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
-    id 'maven-publish'
+//    id 'maven-publish'
 }
 
 android {
@@ -50,15 +50,15 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.github.sotware-supremacy'
-                artifactId = 'general-location-service'
-                version = '0.0.0'
-            }
-        }
-    }
-}
+//afterEvaluate {
+//    publishing {
+//        publications {
+//            release(MavenPublication) {
+//                from components.release
+//                groupId = 'com.github.sotware-supremacy'
+//                artifactId = 'general-location-service'
+//                version = '0.0.0'
+//            }
+//        }
+//    }
+//}

@@ -17,6 +17,9 @@ buildscript {
         classpath "com.huawei.agconnect:agcp:$hms_service_version"
         classpath "com.google.gms:google-services:$gms_service_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
+
+        // Add the Crashlytics Gradle plugin
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
     }
 }
 
