@@ -1,6 +1,7 @@
 package com.gateway.glslibrary
 
 import android.app.Application
+import com.gateway.glscrashlytics.Crashlytics
 import com.gateway.glslibrary.di.LibraryModule
 import timber.log.Timber
 
@@ -8,6 +9,7 @@ class GLSApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         timberConfig()
+        Crashlytics.instance
         LibraryModule.initializeService(this)
     }
 

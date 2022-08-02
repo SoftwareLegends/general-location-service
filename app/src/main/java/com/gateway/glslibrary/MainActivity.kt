@@ -2,7 +2,9 @@ package com.gateway.glslibrary
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.gateway.glscrashlytics.Crashlytics
 import com.gateway.glslibrary.di.LocationServiceModule
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
