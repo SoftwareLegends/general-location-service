@@ -7,12 +7,15 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.glslibrary.domain.Resource
 import com.gateway.glslibrary.domain.interfaces.LocationService
+import com.gateway.glslibrary.domain.models.Error
 import com.gateway.glslibrary.utils.extenstions.await
 import com.huawei.hms.common.ResolvableApiException
-import com.huawei.hms.location.FusedLocationProviderClient
-import com.huawei.hms.location.LocationRequest
-import com.huawei.hms.location.LocationServices
-import com.huawei.hms.location.LocationSettingsRequest
+import com.huawei.hms.location.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import timber.log.Timber
 
 class HuaweiService(
@@ -25,8 +28,18 @@ class HuaweiService(
         getLocationResult(context = context, location = location)
     }
 
-    override suspend fun getCurrentLocation(): Resource<Location> {
-        TODO("Not yet implemented")
+    override fun requestLocationUpdates(): Flow<Resource<Location>> = callbackFlow {
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                result.locations.forEach { location ->
+                    trySendBlocking(Resource.Success(data = location))
+                        .onFailure {
+                            trySendBlocking(Resource.Fail(data = Error(message = it?.message)))
+                        }
+                }
+            }
+        }
+        awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
     }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {

@@ -7,11 +7,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.glslibrary.domain.Resource
 import com.gateway.glslibrary.domain.interfaces.LocationService
+import com.gateway.glslibrary.domain.models.Error
 import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.onFailure
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -25,8 +28,18 @@ class GoogleService(
         getLocationResult(context = context, location = location)
     }
 
-    override suspend fun getCurrentLocation(): Resource<Location> {
-        TODO("Not yet implemented")
+    override fun requestLocationUpdates(): Flow<Resource<Location>> = callbackFlow {
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                result.locations.forEach { location ->
+                    trySendBlocking(Resource.Success(data = location))
+                        .onFailure {
+                            trySendBlocking(Resource.Fail(data = Error(message = it?.message)))
+                        }
+                }
+            }
+        }
+        awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
     }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
