@@ -1,6 +1,7 @@
 [![](https://jitpack.io/v/sotware-supremacy/general-location-service.svg)](https://jitpack.io/#sotware-supremacy/general-location-service)
 
-# general-location-service
+# General Location Service (GLS)
+> **for Google & Huawei**
 
 To get a Git project into your build:
 
