@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.flow
 
 class NoneService : LocationService {
     override suspend fun lastLocation(): Resource<Location> =
-        Resource.Fail(data = LocationFailure.LOCATION_SERVICE_NOT_FOUND.toModel())
+        Resource.Fail(error = LocationFailure.LOCATION_SERVICE_NOT_FOUND.toModel())
 
     override fun requestLocationUpdates(): Flow<Resource<Location>> =
-        flow { emit(Resource.Fail(data = LocationFailure.LOCATION_SERVICE_NOT_FOUND.toModel())) }
+        flow { emit(Resource.Fail(error = LocationFailure.LOCATION_SERVICE_NOT_FOUND.toModel())) }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {}
 }

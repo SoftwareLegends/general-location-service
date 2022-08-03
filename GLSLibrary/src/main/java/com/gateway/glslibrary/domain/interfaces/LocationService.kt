@@ -34,15 +34,15 @@ interface LocationService {
         }
 
         return if (context.isGpsProviderEnabled().not())
-            Resource.Fail(data = LocationFailure.GPS_PROVIDER_IS_DISABLED.toModel())
+            Resource.Fail(error = LocationFailure.GPS_PROVIDER_IS_DISABLED.toModel())
         else
-            Resource.Fail(data = LocationFailure.LOCATION_NEVER_RECORDED.toModel())
+            Resource.Fail(error = LocationFailure.LOCATION_NEVER_RECORDED.toModel())
     }
 
     private suspend fun <T> catchError(block: suspend () -> Resource<T>) = try {
         block()
     } catch (e: Exception) {
         Timber.e(e)
-        Resource.Fail(data = Error(message = e.message))
+        Resource.Fail(error = Error(message = e.message))
     }
 }

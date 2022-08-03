@@ -34,7 +34,7 @@ class GoogleService(
                 result.locations.forEach { location ->
                     trySendBlocking(Resource.Success(data = location))
                         .onFailure {
-                            trySendBlocking(Resource.Fail(data = Error(message = it?.message)))
+                            trySendBlocking(Resource.Fail(error = Error(message = it?.message)))
                         }
                 }
             }
