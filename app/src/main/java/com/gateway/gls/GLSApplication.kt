@@ -1,16 +1,15 @@
 package com.gateway.gls
 
 import android.app.Application
-import com.gateway.glscrashlytics.Crashlytics
-import com.gateway.gls.di.LibraryModule
+import com.gateway.gls.di.GLServiceLocator
 import timber.log.Timber
 
 class GLSApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         timberConfig()
-//        Crashlytics.instance
-        LibraryModule.initializeService(this)
+//        GLSCrashlytics.instance
+        GLServiceLocator.initializeService(this)
     }
 
     private fun timberConfig(){

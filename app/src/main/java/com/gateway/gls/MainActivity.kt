@@ -2,7 +2,7 @@ package com.gateway.gls
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.gateway.gls.di.LocationServiceModule
+import com.gateway.gls.di.GLServiceLocator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun testGLSLibrary(){
-        LocationServiceModule.locationRepository.run {
+        GLServiceLocator.locationRepository.run {
             Timber.d("is Location Service Available: $isLocationServicesAvailable")
             CoroutineScope(Dispatchers.IO).launch {
                 lastLocation().collect {
