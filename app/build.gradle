@@ -1,8 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.firebase.crashlytics'
-    id 'com.google.gms.google-services' // Google services Gradle plugin
+//    id 'com.google.firebase.crashlytics'
+//    id 'com.google.gms.google-services' // Google services Gradle plugin
 
 }
 
@@ -10,7 +10,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.gateway.glslibrary"
+        applicationId "com.gateway.gls"
         minSdk 21
         targetSdk 32
         versionCode 1
@@ -53,6 +53,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
-    implementation project(":GLSLibrary")
+    implementation project(":gls")
     implementation project(":GLSCrashlytics")
 }

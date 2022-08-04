@@ -18,5 +18,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "General Location Service Library"
 include ':app'
-include ':GLSLibrary'
+include ':gls'
 include ':GLSCrashlytics'
