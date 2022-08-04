@@ -3,7 +3,7 @@ package com.gateway.gls.data
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.Resource
+import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
 import com.gateway.gls.utils.enums.LocationFailure
 import com.gateway.gls.utils.extenstions.toModel

@@ -1,6 +1,4 @@
-package com.gateway.gls.domain
-
-import com.gateway.gls.domain.models.Error
+package com.gateway.gls.domain.models
 
 
 sealed class Resource<out T> {

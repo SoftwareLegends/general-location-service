@@ -2,7 +2,7 @@ package com.gateway.gls.di
 
 import android.app.Application
 import com.gateway.gls.data.*
-import com.gateway.gls.domain.Services
+import com.gateway.gls.domain.models.Services
 import com.gateway.gls.domain.interfaces.LocationRepository
 import com.gateway.gls.utils.LocationRequestProvider
 import com.google.android.gms.common.ConnectionResult
@@ -14,7 +14,7 @@ import com.huawei.hms.location.LocationServices as HuaweiLocationServices
 
 object GLServiceLocator {
     @Volatile
-    lateinit var application: Application
+    private lateinit var application: Application
     private val googleLocationProviderClient by lazy { provideGoogleLocationProviderClient() }
     private val huaweiLocationProviderClient by lazy { provideHuaweiLocationProviderClient() }
     private val googleApiAvailability: GoogleApiAvailability by lazy { provideGoogleApiAvailability() }
@@ -59,7 +59,7 @@ object GLServiceLocator {
     private fun provideHuaweiLocationProviderClient() =
         HuaweiLocationServices.getFusedLocationProviderClient(application)
 
-    private fun provideLocationRepository() : LocationRepository = LocationRepositoryImpl(
+    private fun provideLocationRepository(): LocationRepository = LocationRepositoryImpl(
         service = when (GLServiceAvailability.serviceProvider) {
             is Services.Google -> googleService
             is Services.Huawei -> huaweiService

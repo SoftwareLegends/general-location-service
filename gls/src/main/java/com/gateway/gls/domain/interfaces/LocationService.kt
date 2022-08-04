@@ -6,7 +6,7 @@ import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.annotation.RequiresPermission
-import com.gateway.gls.domain.Resource
+import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.Error
 import com.gateway.gls.utils.enums.LocationFailure
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled

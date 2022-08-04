@@ -5,7 +5,7 @@ import android.content.IntentSender
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.Resource
+import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
 import com.gateway.gls.domain.models.Error
 import com.google.android.gms.common.api.ResolvableApiException

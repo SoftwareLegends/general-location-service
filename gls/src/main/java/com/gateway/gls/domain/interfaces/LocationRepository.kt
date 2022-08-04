@@ -3,7 +3,7 @@ package com.gateway.gls.domain.interfaces
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.Resource
+import com.gateway.gls.domain.models.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
