@@ -17,8 +17,7 @@ class LocationRepositoryImpl(private val service: LocationService) : LocationRep
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =
         service.locationSettings(resultContracts = resultContracts)
 
-    override val isLocationServicesAvailable: Boolean =
-        LocationServiceAvailability.isLocationServicesAvailable
+    override val isLocationServicesAvailable: Boolean = GLServiceAvailability.isServicesAvailable
 
     private fun <T> wrapWithFlow(block: suspend () -> Resource<T>): Flow<Resource<T>> = flow {
         emit(Resource.Loading)
