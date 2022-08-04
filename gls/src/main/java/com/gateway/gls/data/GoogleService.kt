@@ -7,7 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
-import com.gateway.gls.domain.models.Error
+import com.gateway.gls.domain.models.ServiceFailure
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import kotlinx.coroutines.channels.awaitClose
@@ -34,7 +34,7 @@ class GoogleService(
                 result.locations.forEach { location ->
                     trySendBlocking(Resource.Success(data = location))
                         .onFailure {
-                            trySendBlocking(Resource.Fail(error = Error(message = it?.message)))
+                            trySendBlocking(Resource.Fail(error = ServiceFailure.UnknownError(message = it?.message)))
                         }
                 }
             }

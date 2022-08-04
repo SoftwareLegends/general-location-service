@@ -7,7 +7,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
-import com.gateway.gls.domain.models.Error
+import com.gateway.gls.domain.models.ServiceFailure
 import com.gateway.gls.utils.extenstions.await
 import com.huawei.hms.common.ResolvableApiException
 import com.huawei.hms.location.*
@@ -34,7 +34,7 @@ class HuaweiService(
                 result.locations.forEach { location ->
                     trySendBlocking(Resource.Success(data = location))
                         .onFailure {
-                            trySendBlocking(Resource.Fail(error = Error(message = it?.message)))
+                            trySendBlocking(Resource.Fail(error = ServiceFailure.UnknownError(message = it?.message)))
                         }
                 }
             }

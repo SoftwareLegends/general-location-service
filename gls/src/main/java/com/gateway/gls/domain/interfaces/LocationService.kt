@@ -7,10 +7,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.annotation.RequiresPermission
 import com.gateway.gls.domain.models.Resource
-import com.gateway.gls.domain.models.Error
-import com.gateway.gls.utils.enums.LocationFailure
+import com.gateway.gls.domain.models.ServiceFailure
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
-import com.gateway.gls.utils.extenstions.toModel
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
@@ -34,15 +32,15 @@ interface LocationService {
         }
 
         return if (context.isGpsProviderEnabled().not())
-            Resource.Fail(error = LocationFailure.GPS_PROVIDER_IS_DISABLED.toModel())
+            Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
         else
-            Resource.Fail(error = LocationFailure.LOCATION_NEVER_RECORDED.toModel())
+            Resource.Fail(error = ServiceFailure.LocationNeverRecorded())
     }
 
     private suspend fun <T> catchError(block: suspend () -> Resource<T>) = try {
         block()
     } catch (e: Exception) {
         Timber.e(e)
-        Resource.Fail(error = Error(message = e.message))
+        Resource.Fail(error = ServiceFailure.UnknownError(message = e.message))
     }
 }
