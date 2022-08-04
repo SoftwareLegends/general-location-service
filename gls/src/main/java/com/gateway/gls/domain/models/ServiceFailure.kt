@@ -20,4 +20,9 @@ sealed interface ServiceFailure {
         val message: String? = "Location service not found",
         val code: Int = 404
     ) : ServiceFailure
+
+    data class UnknownError(
+        val message: String? = "Unknown Error",
+        val code: Int = 520
+    ) : ServiceFailure
 }
