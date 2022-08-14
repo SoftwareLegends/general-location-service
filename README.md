@@ -48,10 +48,10 @@ class MainActivity : AppCompatActivity() {
 	// Use Repository
 	
 	CoroutineScope(Dispatchers.IO).launch{
-            Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
-        
             with(GLServiceLocator.locationRepository) {
-                this.lastLocation().collect {
+                Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
+                
+                lastLocation().collect {
                     // Do Something
                 }
             }
