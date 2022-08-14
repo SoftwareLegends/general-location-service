@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         GLServiceLocator.locationRepository.run {
             Timber.d("is Location Service Available: $isLocationServicesAvailable")
             CoroutineScope(Dispatchers.IO).launch {
-                lastLocation().collect {
+                requestLocationUpdates().collect {
                     Timber.d(it.toString().substringAfter('$'))
                 }
             }

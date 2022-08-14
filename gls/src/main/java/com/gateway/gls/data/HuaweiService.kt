@@ -3,12 +3,14 @@ package com.gateway.gls.data
 import android.content.Context
 import android.content.IntentSender
 import android.location.Location
+import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
+import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.ServiceFailure
 import com.gateway.gls.utils.extenstions.await
+import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.huawei.hms.common.ResolvableApiException
 import com.huawei.hms.location.*
 import kotlinx.coroutines.channels.awaitClose
@@ -34,11 +36,27 @@ class HuaweiService(
                 result.locations.forEach { location ->
                     trySendBlocking(Resource.Success(data = location))
                         .onFailure {
-                            trySendBlocking(Resource.Fail(error = ServiceFailure.UnknownError(message = it?.message)))
+                            trySendBlocking(
+                                Resource.Fail(
+                                    error = ServiceFailure.UnknownError(
+                                        message = it?.message
+                                    )
+                                )
+                            )
                         }
                 }
             }
         }
+
+        if (context.isGpsProviderEnabled().not())
+            trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
+        else
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
     }
 
