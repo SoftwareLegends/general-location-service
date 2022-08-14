@@ -1,13 +1,16 @@
 package com.gateway.gls.data
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.IntentSender
 import android.location.Location
+import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.interfaces.LocationService
+import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.ServiceFailure
+import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import kotlinx.coroutines.channels.awaitClose
@@ -18,6 +21,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
+@SuppressLint("MissingPermission")
 class GoogleService(
     private val context: Context,
     private val fusedLocationClient: FusedLocationProviderClient,
@@ -34,11 +38,26 @@ class GoogleService(
                 result.locations.forEach { location ->
                     trySendBlocking(Resource.Success(data = location))
                         .onFailure {
-                            trySendBlocking(Resource.Fail(error = ServiceFailure.UnknownError(message = it?.message)))
+                            trySendBlocking(
+                                Resource.Fail(
+                                    error = ServiceFailure.UnknownError(
+                                        message = it?.message
+                                    )
+                                )
+                            )
                         }
                 }
             }
         }
+        if (context.isGpsProviderEnabled().not())
+            trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
+        else
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
     }
 
