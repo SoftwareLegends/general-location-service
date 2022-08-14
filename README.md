@@ -24,3 +24,37 @@ dependencies {
 	        implementation 'com.github.sotware-supremacy:general-location-service:<VERSION>'
 }
 ```
+
+## Usage
+> **put this in AndroidManifest.xml**
+```xml
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+```
+
+```kotlin
+import com.gateway.gms.di.GMServiceLocator
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        ...
+	
+	// initialize service 
+	
+	GLServiceLocator.initializeService(this.application)
+	
+	// Use Repository
+	
+	CoroutineScope(Dispatchers.IO).launch{
+            Log.d("is Location Service Available: $isLocationServicesAvailable")
+        
+            with(GLServiceLocator.locationRepository) {
+                this.lastLocation().collect {
+                    // Do Something
+                }
+            }
+        }
+    }
+}
+```
