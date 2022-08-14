@@ -34,6 +34,7 @@ dependencies {
 ```
 
 ```kotlin
+...
 import com.gateway.gms.di.GMServiceLocator
 
 class MainActivity : AppCompatActivity() {
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
 	// Use Repository
 	
 	CoroutineScope(Dispatchers.IO).launch{
-            Log.d("is Location Service Available: $isLocationServicesAvailable")
+            Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
         
             with(GLServiceLocator.locationRepository) {
                 this.lastLocation().collect {
