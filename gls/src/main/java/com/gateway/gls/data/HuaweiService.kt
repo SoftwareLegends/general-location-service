@@ -47,7 +47,7 @@ class HuaweiService(
                 }
             }
         }
-
+        Timber.d(locationRequest.interval.toString())
         if (context.isGpsProviderEnabled().not())
             trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
         else
@@ -58,6 +58,20 @@ class HuaweiService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
+    }
+
+    override fun configureLocationRequest(
+        priority: Int,
+        interval: Long,
+        fastestInterval: Long,
+        numUpdates: Int
+    ) {
+        locationRequest.apply {
+            this.priority = priority
+            this.interval = interval
+            this.fastestInterval = fastestInterval
+            this.numUpdates = numUpdates
+        }
     }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
@@ -85,6 +99,7 @@ class HuaweiService(
                     resultContracts.launch(intentSenderRequest)
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
+                    Timber.d(sendEx.message)
                 }
             }
         }

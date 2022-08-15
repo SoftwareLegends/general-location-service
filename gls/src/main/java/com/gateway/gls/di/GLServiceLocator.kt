@@ -24,7 +24,7 @@ object GLServiceLocator {
     private val huaweiService: HuaweiService by lazy { provideHuaweiService() }
 
     /**
-     * This function should called in MainActivity
+     * This function should called in MainActivity or an Application instance.
 
      * to provide an application instance for the service.
      *

@@ -16,5 +16,12 @@ class NoneService : LocationService {
     override fun requestLocationUpdates(): Flow<Resource<Location>> =
         flow { emit(Resource.Fail(error = ServiceFailure.LocationServiceNotFound())) }
 
+    override fun configureLocationRequest(
+        priority: Int,
+        interval: Long,
+        fastestInterval: Long,
+        numUpdates: Int
+    ) {}
+
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {}
 }

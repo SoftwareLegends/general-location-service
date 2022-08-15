@@ -2,30 +2,33 @@
 buildscript {
     ext {
         timber_version = '5.0.1'
-        gson_version = '2.9.0'
+        gson_version = '2.9.1'
         gms_service_version = '4.3.13'
         gms_location_version = '20.0.0'
         hms_service_version = '1.6.0.300'
         hms_location_version = '6.4.0.300'
+        gradle_version = '7.2.2'
+        kotlin_version = '1.7.10'
+        crashlytics_version = '2.9.1'
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:7.0.4"
+        classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "com.huawei.agconnect:agcp:$hms_service_version"
         classpath "com.google.gms:google-services:$gms_service_version"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         // Add the Crashlytics Gradle plugin
-        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.1'
+        classpath "com.google.firebase:firebase-crashlytics-gradle:$crashlytics_version"
     }
 }
 
 plugins {
-    id 'com.android.application' version '7.2.1' apply false
-    id 'com.android.library' version '7.2.1' apply false
+    id 'com.android.application' version '7.2.2' apply false
+    id 'com.android.library' version '7.2.2' apply false
     id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
 }
 
