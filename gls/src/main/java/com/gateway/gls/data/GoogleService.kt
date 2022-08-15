@@ -10,6 +10,7 @@ import androidx.activity.result.IntentSenderRequest
 import com.gateway.gls.domain.interfaces.LocationService
 import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.ServiceFailure
+import com.gateway.gls.utils.Constant
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -30,6 +31,20 @@ class GoogleService(
     override suspend fun lastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()
         getLocationResult(context = context, location = location)
+    }
+
+    override fun configureLocationRequest(
+        priority: Int,
+        interval: Long,
+        fastestInterval: Long,
+        numUpdates: Int
+    ) {
+        locationRequest.apply {
+            this.priority = priority
+            this.interval = interval
+            this.fastestInterval = fastestInterval
+            this.numUpdates = numUpdates
+        }
     }
 
     override fun requestLocationUpdates(): Flow<Resource<Location>> = callbackFlow {
@@ -86,6 +101,7 @@ class GoogleService(
                     resultContracts.launch(intentSenderRequest)
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
+                    Timber.d(sendEx.message)
                 }
             }
         }

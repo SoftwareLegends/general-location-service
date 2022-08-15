@@ -8,7 +8,9 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.annotation.RequiresPermission
 import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.ServiceFailure
+import com.gateway.gls.utils.Constant
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
@@ -21,6 +23,13 @@ interface LocationService {
     suspend fun lastLocation(): Resource<Location>
 
     fun requestLocationUpdates() : Flow<Resource<Location>>
+
+    fun configureLocationRequest(
+        priority: Int = Priority.PRIORITY_HIGH_ACCURACY,
+        interval: Long = Constant.UPDATE_INTERVAL_IN_MILLISECONDS,
+        fastestInterval: Long = Constant.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS,
+        numUpdates: Int = Constant.NUMBER_OF_UPDATES
+    )
 
     fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)
 
