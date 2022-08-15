@@ -50,12 +50,33 @@ class MainActivity : AppCompatActivity() {
 	CoroutineScope(Dispatchers.IO).launch{
             with(GLServiceLocator.locationRepository) {
                 Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
-                
                 lastLocation().collect {
                     // Do Something
                 }
             }
         }
+    }
+}
+```
+
+```kotlin
+// Also can configure the location request for location updates
+
+// first import Priority class
+import com.gateway.gls.domain.models.Priority
+
+// Then just use the `configureLocationRequest` method
+CoroutineScope(Dispatchers.IO).launch{
+        with(GLServiceLocator.locationRepository) {
+            configureLocationRequest(
+                interval = 3000,
+                priority = Priority.BalancedPowerAccuracy,
+                numUpdates = 3
+            )
+            
+            requestLocationUpdates().collect{
+                // Do something
+            }
     }
 }
 ```
