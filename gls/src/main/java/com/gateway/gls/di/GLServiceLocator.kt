@@ -1,9 +1,9 @@
 package com.gateway.gls.di
 
-import android.app.Application
+import android.content.Context
 import com.gateway.gls.data.*
-import com.gateway.gls.domain.models.Services
 import com.gateway.gls.domain.interfaces.LocationRepository
+import com.gateway.gls.domain.models.Services
 import com.gateway.gls.utils.LocationRequestProvider
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -14,7 +14,7 @@ import com.huawei.hms.location.LocationServices as HuaweiLocationServices
 
 object GLServiceLocator {
     @Volatile
-    private lateinit var application: Application
+    private lateinit var applicationContext: Context
     private val googleLocationProviderClient by lazy { provideGoogleLocationProviderClient() }
     private val huaweiLocationProviderClient by lazy { provideHuaweiLocationProviderClient() }
     private val googleApiAvailability: GoogleApiAvailability by lazy { provideGoogleApiAvailability() }
@@ -26,25 +26,25 @@ object GLServiceLocator {
     /**
      * This function should called in MainActivity or an Application instance.
 
-     * to provide an application instance for the service.
+     * to provide an applicationContext instance for the service.
      *
      * @author Ahmed Mones
      */
-    fun initializeService(application: Application) {
-        if (this::application.isInitialized.not()) {
-            synchronized(application) { this.application = application }
+    fun initializeService(applicationContext: Context) {
+        if (this::applicationContext.isInitialized.not()) {
+            synchronized(applicationContext) { this.applicationContext = applicationContext }
             prepareAvailability()
         }
     }
 
     private fun provideGoogleService() = GoogleService(
-        context = application,
+        context = applicationContext,
         locationRequest = LocationRequestProvider.Google.locationRequest,
         fusedLocationClient = googleLocationProviderClient
     )
 
     private fun provideHuaweiService() = HuaweiService(
-        context = application,
+        context = applicationContext,
         locationRequest = LocationRequestProvider.Huawei.locationRequest,
         fusedLocationClient = huaweiLocationProviderClient
     )
@@ -54,10 +54,10 @@ object GLServiceLocator {
     private fun provideHuaweiApiAvailability() = HuaweiApiAvailability.getInstance()
 
     private fun provideGoogleLocationProviderClient() =
-        GoogleLocationServices.getFusedLocationProviderClient(application)
+        GoogleLocationServices.getFusedLocationProviderClient(applicationContext)
 
     private fun provideHuaweiLocationProviderClient() =
-        HuaweiLocationServices.getFusedLocationProviderClient(application)
+        HuaweiLocationServices.getFusedLocationProviderClient(applicationContext)
 
     private fun provideLocationRepository(): LocationRepository = LocationRepositoryImpl(
         service = when (GLServiceAvailability.serviceProvider) {
@@ -70,10 +70,10 @@ object GLServiceLocator {
     private fun prepareAvailability() {
         GLServiceAvailability.isServicesAvailable = with(GLServiceLocator) {
             when (ConnectionResult.SUCCESS) {
-                googleApiAvailability.isGooglePlayServicesAvailable(application) -> setServiceProvider(
+                googleApiAvailability.isGooglePlayServicesAvailable(applicationContext) -> setServiceProvider(
                     service = Services.Google
                 )
-                huaweiApiAvailability.isHuaweiMobileServicesAvailable(application) -> setServiceProvider(
+                huaweiApiAvailability.isHuaweiMobileServicesAvailable(applicationContext) -> setServiceProvider(
                     service = Services.Huawei
                 )
                 else -> false
