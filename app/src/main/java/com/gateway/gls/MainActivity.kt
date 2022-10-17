@@ -1,9 +1,8 @@
 package com.gateway.gls
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.gateway.gls.di.GLServiceLocator
-import com.gateway.gls.domain.models.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,18 +15,10 @@ class MainActivity : AppCompatActivity() {
         testGLSLibrary()
     }
 
-    private fun testGLSLibrary(){
-        GLServiceLocator.locationRepository.run {
-            configureLocationRequest(
-                interval = 3000,
-                priority = Priority.BalancedPowerAccuracy,
-                numUpdates = 3
-            )
-            Timber.d("is Location Service Available: $isLocationServicesAvailable")
-            CoroutineScope(Dispatchers.IO).launch {
-                requestLocationUpdates().collect {
-                    Timber.d(it.toString().substringAfter('$'))
-                }
+    private fun testGLSLibrary() {
+        CoroutineScope(Dispatchers.IO).launch {
+            GLServiceLocator.locationRepository.requestLocationUpdates().also {
+                Timber.d("\nLAST LOCATION: ${it.toData}\n")
             }
         }
     }

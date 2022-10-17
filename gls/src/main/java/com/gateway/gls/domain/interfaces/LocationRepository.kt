@@ -9,9 +9,12 @@ import com.gateway.gls.utils.Constant
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
-    fun lastLocation(): Flow<Resource<Location>>
+    fun lastLocationAsFlow(): Flow<Resource<Location>>
+    suspend fun lastLocation(): Resource<Location>
 
-    fun requestLocationUpdates(): Flow<Resource<Location>>
+    fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>>
+
+    suspend fun requestLocationUpdates(): Resource<List<Location>>
 
     fun configureLocationRequest(
         priority: Priority = Priority.HighAccuracy,

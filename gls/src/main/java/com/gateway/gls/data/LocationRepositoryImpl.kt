@@ -1,5 +1,6 @@
 package com.gateway.gls.data
 
+import android.annotation.SuppressLint
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
@@ -10,9 +11,16 @@ import com.gateway.gls.domain.models.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
+@SuppressLint("MissingPermission")
 class LocationRepositoryImpl(private val service: LocationService) : LocationRepository {
-    override fun lastLocation(): Flow<Resource<Location>> = wrapWithFlow(service::lastLocation)
-    override fun requestLocationUpdates(): Flow<Resource<Location>> =
+    override fun lastLocationAsFlow(): Flow<Resource<Location>> = wrapWithFlow(service::lastLocation)
+
+    override suspend fun lastLocation(): Resource<Location> = service.lastLocation()
+
+    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
+        service.requestLocationUpdatesAsFlow()
+
+    override suspend fun requestLocationUpdates(): Resource<List<Location>> =
         service.requestLocationUpdates()
 
     override fun configureLocationRequest(

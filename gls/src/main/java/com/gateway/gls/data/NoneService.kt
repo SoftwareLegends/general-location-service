@@ -13,7 +13,10 @@ class NoneService : LocationService {
     override suspend fun lastLocation(): Resource<Location> =
         Resource.Fail(error = ServiceFailure.LocationServiceNotFound())
 
-    override fun requestLocationUpdates(): Flow<Resource<Location>> =
+    override suspend fun requestLocationUpdates(): Resource<List<Location>> =
+        Resource.Fail(error = ServiceFailure.LocationServiceNotFound())
+
+    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
         flow { emit(Resource.Fail(error = ServiceFailure.LocationServiceNotFound())) }
 
     override fun configureLocationRequest(
