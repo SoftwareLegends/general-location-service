@@ -22,7 +22,8 @@ interface LocationService {
     )
     suspend fun lastLocation(): Resource<Location>
 
-    fun requestLocationUpdates() : Flow<Resource<Location>>
+    fun requestLocationUpdatesAsFlow() : Flow<Resource<Location>>
+    suspend fun requestLocationUpdates() : Resource<List<Location>>
 
     fun configureLocationRequest(
         priority: Int = Priority.PRIORITY_HIGH_ACCURACY,

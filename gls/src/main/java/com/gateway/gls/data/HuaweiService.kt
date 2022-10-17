@@ -30,7 +30,7 @@ class HuaweiService(
         getLocationResult(context = context, location = location)
     }
 
-    override fun requestLocationUpdates(): Flow<Resource<Location>> = callbackFlow {
+    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.locations.forEach { location ->
@@ -47,7 +47,7 @@ class HuaweiService(
                 }
             }
         }
-        Timber.d(locationRequest.interval.toString())
+
         if (context.isGpsProviderEnabled().not())
             trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
         else
@@ -58,6 +58,36 @@ class HuaweiService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
+    }
+
+    override suspend fun requestLocationUpdates(): Resource<List<Location>> {
+        var results: Resource<List<Location>> = Resource.Init
+
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                runCatching{
+                    results = Resource.Success(result.locations)
+                }.onFailure {
+                    results = Resource.Fail(
+                        error = ServiceFailure.UnknownError(
+                            message = it.message
+                        )
+                    )
+                }
+            }
+        }
+
+        if (context.isGpsProviderEnabled().not())
+            results = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
+        else
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        return results
     }
 
     override fun configureLocationRequest(

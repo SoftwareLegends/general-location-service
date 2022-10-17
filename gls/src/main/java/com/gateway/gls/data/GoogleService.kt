@@ -10,15 +10,16 @@ import androidx.activity.result.IntentSenderRequest
 import com.gateway.gls.domain.interfaces.LocationService
 import com.gateway.gls.domain.models.Resource
 import com.gateway.gls.domain.models.ServiceFailure
-import com.gateway.gls.utils.Constant
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -47,7 +48,7 @@ class GoogleService(
         }
     }
 
-    override fun requestLocationUpdates(): Flow<Resource<Location>> = callbackFlow {
+    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.locations.forEach { location ->
@@ -74,6 +75,44 @@ class GoogleService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
+    }
+
+    override suspend fun requestLocationUpdates(): Resource<List<Location>> {
+        var results: Resource<List<Location>> = Resource.Init
+        var isRunning = true
+
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                runCatching {
+                    results = Resource.Success(data = result.locations)
+                }.onFailure {
+                    results = Resource.Fail(
+                        error = ServiceFailure.UnknownError(
+                            message = it.message
+                        )
+                    )
+                }
+
+                isRunning = false
+            }
+        }
+
+
+        if (context.isGpsProviderEnabled().not())
+            results = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
+        else
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+
+        while (isRunning) {
+            delay(100)
+        }
+
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+        return results
     }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
