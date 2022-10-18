@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private fun testGLSLibrary() {
         CoroutineScope(Dispatchers.IO).launch {
             GLServiceLocator.locationRepository.requestLocationUpdates().also {
-                Timber.d("\nLAST LOCATION: ${it.toData}\n")
+                Timber.d("\nLOCATIONS: ${it.toData}\n")
             }
         }
     }
