@@ -81,7 +81,6 @@ class GoogleService(
         var status: Resource<List<Location>> = Resource.Init
 
         var isRunning: Boolean = true
-        locationRequest.numUpdates = 3
         var numUpdates: Int = locationRequest.numUpdates
 
         val locationCallback = object : LocationCallback() {
@@ -89,7 +88,6 @@ class GoogleService(
                 runCatching {
                     results.addAll(result.locations)
                     status = Resource.Success(data = results)
-                    Timber.d(results.toString())
                 }.onFailure {
                     status = Resource.Fail(
                         error = ServiceFailure.UnknownError(

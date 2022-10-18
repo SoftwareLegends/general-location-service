@@ -16,6 +16,7 @@ import com.huawei.hms.location.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import timber.log.Timber
@@ -61,24 +62,34 @@ class HuaweiService(
     }
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
-        var results: Resource<List<Location>> = Resource.Init
+        val results: MutableList<Location> = mutableListOf()
+        var status: Resource<List<Location>> = Resource.Init
+
+        var isRunning: Boolean = true
+        var numUpdates: Int = locationRequest.numUpdates
 
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 runCatching{
-                    results = Resource.Success(result.locations)
+                    results.addAll(result.locations)
+                    status = Resource.Success(data = results)
                 }.onFailure {
-                    results = Resource.Fail(
+                    status = Resource.Fail(
                         error = ServiceFailure.UnknownError(
                             message = it.message
                         )
                     )
                 }
+
+                numUpdates--
+
+                if (numUpdates == 0)
+                    isRunning = false
             }
         }
 
         if (context.isGpsProviderEnabled().not())
-            results = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
+            status = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
         else
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
@@ -86,8 +97,12 @@ class HuaweiService(
                 Looper.getMainLooper()
             )
 
+        while (isRunning) {
+            delay(100)
+        }
+
         fusedLocationClient.removeLocationUpdates(locationCallback)
-        return results
+        return status
     }
 
     override fun configureLocationRequest(
