@@ -19,7 +19,6 @@ import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -78,28 +77,35 @@ class GoogleService(
     }
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
-        var results: Resource<List<Location>> = Resource.Init
-        var isRunning = true
+        val results: MutableList<Location> = mutableListOf()
+        var status: Resource<List<Location>> = Resource.Init
+
+        var isRunning: Boolean = true
+        var numUpdates: Int = locationRequest.numUpdates
 
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 runCatching {
-                    results = Resource.Success(data = result.locations)
+                    results.addAll(result.locations)
+                    status = Resource.Success(data = results)
                 }.onFailure {
-                    results = Resource.Fail(
+                    status = Resource.Fail(
                         error = ServiceFailure.UnknownError(
                             message = it.message
                         )
                     )
                 }
 
-                isRunning = false
+                numUpdates--
+
+                if (numUpdates == 0)
+                    isRunning = false
             }
         }
 
 
         if (context.isGpsProviderEnabled().not())
-            results = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
+            status = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
         else
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
@@ -108,11 +114,11 @@ class GoogleService(
             )
 
         while (isRunning) {
-            delay(100)
+            delay(locationRequest.interval)
         }
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
-        return results
+        return status
     }
 
     override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
