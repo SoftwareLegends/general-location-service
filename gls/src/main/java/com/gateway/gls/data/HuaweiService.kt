@@ -98,7 +98,7 @@ class HuaweiService(
             )
 
         while (isRunning) {
-            delay(100)
+            delay(locationRequest.interval)
         }
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
