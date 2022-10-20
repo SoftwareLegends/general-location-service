@@ -4,17 +4,21 @@ buildscript {
         timber_version = '5.0.1'
         gson_version = '2.9.1'
         gms_service_version = '4.3.13'
-        gms_location_version = '20.0.0'
+        gms_location_version = '21.0.0'
         hms_service_version = '1.6.0.300'
         hms_location_version = '6.4.0.300'
-        gradle_version = '7.2.2'
-        kotlin_version = '1.7.10'
+        gradle_version = '7.3.1'
+        kotlin_version = '1.7.20'
         crashlytics_version = '2.9.1'
+        jvm_version = JavaVersion.VERSION_11
+        sdk_version = 33
     }
+
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
         classpath "com.android.tools.build:gradle:$gradle_version"
         classpath "com.huawei.agconnect:agcp:$hms_service_version"
@@ -27,9 +31,10 @@ buildscript {
 }
 
 plugins {
-    id 'com.android.application' version '7.2.2' apply false
-    id 'com.android.library' version '7.2.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
+    id 'com.android.application' version "$gradle_version" apply false
+    id 'com.android.library' version "$gradle_version" apply false
+    id 'org.jetbrains.kotlin.android' version "$kotlin_version" apply false
+    id 'org.jetbrains.kotlin.jvm' version "$kotlin_version" apply false
 }
 
 task clean(type: Delete) {
