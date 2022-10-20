@@ -43,14 +43,14 @@ class MainActivity : AppCompatActivity() {
 	
 	// initialize service 
 	
-	GLServiceLocator.initializeService(this.application)
-	
+	GLSInitializer.init(applicationContext)
+	val glsManager = GLSManager()
 	// Use Repository
 	
 	CoroutineScope(Dispatchers.IO).launch{
-            with(GLServiceLocator.locationRepository) {
+            with(glsManager) {
                 Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
-                lastLocation().collect {
+                getLastLocationAsFlow().collect {
                     // Do Something
                 }
             }
@@ -67,14 +67,14 @@ import com.gateway.gls.domain.models.Priority
 
 // Then just use the `configureLocationRequest` method
 CoroutineScope(Dispatchers.IO).launch{
-        with(GLServiceLocator.locationRepository) {
+        with(glsManager) {
             configureLocationRequest(
-                interval = 3000,
+                intervalMillis = 3000,
                 priority = Priority.BalancedPowerAccuracy,
-                numUpdates = 3
+                maxUpdates = 3
             )
             
-            requestLocationUpdates().collect{
+            requestLocationUpdatesAsFlow().collect{
                 // Do something
             }
     }
