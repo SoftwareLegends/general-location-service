@@ -3,35 +3,35 @@ package com.gateway.core.exceptions.base
 sealed class Error(
     override val message: String?,
     val name: String
-    ): Throwable() {
+    ): BaseException() {
     data class ResponseError(
         override val message: String? = RESPONSE_ERROR,
-        val code: Int
+        override val code: Int
     ) : Error(message = message, name = "ResponseError")
 
     data class HttpError(
         override val message: String? = HTTP_ERROR,
-        val code: Int
+        override val code: Int
     ) : Error(message = message, name = "HttpError")
 
     data class UnknownError(
         override val message: String? = UNKNOWN_ERROR,
-        val code: Int? = null
+        override val code: Int = -1
     ) : Error(message = message, name = "UnknownError")
 
     data class TimeoutError(
         override val message: String? = TIMEOUT_ERROR,
-        val code: Int = 408
+        override val code: Int = 408
     ) : Error(message = message, name = "TimeoutError")
 
     data class NetworkError(
         override val message: String? = NETWORK_ERROR,
-        val code: Int = 408
+        override val code: Int = 408
     ) : Error(message = message, name = "NetworkError")
 
     data class GpsError(
         override val message: String? = GPS_ERROR,
-        val code: Int = 200
+        override val code: Int = 200
     ) : Error(message = message, name = "GpsError")
 
     private companion object Errors {

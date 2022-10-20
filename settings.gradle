@@ -20,4 +20,4 @@ rootProject.name = "General Location Service Library"
 include ':app'
 include ':gls'
 include ':GLSCrashlytics'
-include ':Core'
+include ':core'
