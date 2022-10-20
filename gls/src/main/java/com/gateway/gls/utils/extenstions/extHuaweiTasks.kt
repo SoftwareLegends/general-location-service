@@ -14,7 +14,7 @@ import kotlin.coroutines.resumeWithException
  * If the [Job] of the current coroutine is cancelled or completed while this suspending function is waiting, this function
  * stops waiting for the completion stage and immediately resumes with [CancellationException].
  */
-suspend fun <T> Task<T>.await(): T {
+internal suspend fun <T> Task<T>.await(): T {
     // fast path
     if (isComplete) {
         val e = exception
