@@ -69,9 +69,9 @@ import com.gateway.gls.domain.models.Priority
 CoroutineScope(Dispatchers.IO).launch{
         with(GLServiceLocator.locationRepository) {
             configureLocationRequest(
-                interval = 3000,
+                intervalMillis = 3000,
                 priority = Priority.BalancedPowerAccuracy,
-                numUpdates = 3
+                maxUpdates = 3
             )
             
             requestLocationUpdates().collect{
