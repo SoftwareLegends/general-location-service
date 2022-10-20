@@ -13,8 +13,8 @@ android {
         applicationId "com.gateway.gls"
         minSdk 21
         targetSdk sdk_version
-        versionCode 1
-        versionName "1.0"
+        versionCode 8
+        versionName "0.0.${versionCode - 1}"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

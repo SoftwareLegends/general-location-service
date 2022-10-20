@@ -1,7 +1,7 @@
 package com.gateway.gls
 
 import android.app.Application
-import com.gateway.gls.di.GLServiceLocator
+import com.gateway.gls.di.GLSInitializer
 import timber.log.Timber
 
 class GLSApplication : Application() {
@@ -9,7 +9,7 @@ class GLSApplication : Application() {
         super.onCreate()
         timberConfig()
 //        GLSCrashlytics.instance
-        GLServiceLocator.initializeService(this)
+        GLSInitializer.init(applicationContext)
     }
 
     private fun timberConfig(){
