@@ -3,12 +3,12 @@ package com.gateway.gls.domain.interfaces
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.models.Priority
-import com.gateway.gls.domain.models.Resource
-import com.gateway.gls.utils.Constant
+import com.gateway.gls.domain.entities.Priority
+import com.gateway.core.base.Resource
+import com.gateway.gls.utils.LocationRequestDefaults
 import kotlinx.coroutines.flow.Flow
 
-interface LocationRepository {
+internal interface LocationRepository {
     fun lastLocationAsFlow(): Flow<Resource<Location>>
     suspend fun lastLocation(): Resource<Location>
 
@@ -18,12 +18,13 @@ interface LocationRepository {
 
     fun configureLocationRequest(
         priority: Priority = Priority.HighAccuracy,
-        interval: Long = Constant.UPDATE_INTERVAL_IN_MILLISECONDS,
-        fastestInterval: Long = Constant.FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS,
-        numUpdates: Int = Constant.NUMBER_OF_UPDATES
+        intervalMillis: Long = LocationRequestDefaults.UPDATE_INTERVAL_MILLIS,
+        minUpdateIntervalMillis: Long = LocationRequestDefaults.MIN_UPDATE_INTERVAL_MILLIS,
+        maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
+        maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
     )
 
-    fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)
+    fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)
 
     val isLocationServicesAvailable: Boolean
 }
