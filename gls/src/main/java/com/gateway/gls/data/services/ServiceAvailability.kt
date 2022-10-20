@@ -1,4 +1,4 @@
-package com.gateway.gls.services
+package com.gateway.gls.data.services
 
 import com.gateway.gls.domain.entities.Services
 

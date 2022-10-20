@@ -1,4 +1,4 @@
-package com.gateway.gls.domain.interfaces
+package com.gateway.gls.domain.base
 
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher

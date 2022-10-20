@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.interfaces.LocationRepository
-import com.gateway.gls.domain.interfaces.LocationService
+import com.gateway.gls.domain.base.LocationRepository
+import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.core.base.Resource
-import com.gateway.gls.services.ServiceAvailability
+import com.gateway.gls.data.services.ServiceAvailability
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

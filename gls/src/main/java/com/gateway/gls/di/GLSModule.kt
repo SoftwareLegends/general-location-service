@@ -1,13 +1,13 @@
 package com.gateway.gls.di
 
-import com.gateway.gls.services.ServiceAvailability
+import com.gateway.gls.data.services.ServiceAvailability
 import com.gateway.gls.data.LocationRepositoryImpl
 import com.gateway.gls.di.GLSInitializer.applicationContext
-import com.gateway.gls.domain.interfaces.LocationRepository
+import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Services
-import com.gateway.gls.services.GoogleService
-import com.gateway.gls.services.HuaweiService
-import com.gateway.gls.services.NoneService
+import com.gateway.gls.data.services.GoogleService
+import com.gateway.gls.data.services.HuaweiService
+import com.gateway.gls.data.services.NoneService
 import com.gateway.gls.data.LocationRequestProvider
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices as GoogleLocationServices

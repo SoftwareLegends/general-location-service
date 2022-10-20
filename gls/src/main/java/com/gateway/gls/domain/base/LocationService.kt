@@ -1,4 +1,4 @@
-package com.gateway.gls.domain.interfaces
+package com.gateway.gls.domain.base
 
 import android.Manifest
 import android.content.Context

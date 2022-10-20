@@ -1,4 +1,4 @@
-package com.gateway.gls.services
+package com.gateway.gls.data.services
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -10,7 +10,7 @@ import androidx.activity.result.IntentSenderRequest
 import com.gateway.core.base.Resource
 import com.gateway.gls.data.LocationRequestProvider
 import com.gateway.gls.domain.entities.ServiceFailure
-import com.gateway.gls.domain.interfaces.LocationService
+import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException

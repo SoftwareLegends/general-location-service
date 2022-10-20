@@ -1,7 +1,7 @@
 package com.gateway.gls.di
 
 import android.content.Context
-import com.gateway.gls.services.ServiceAvailability
+import com.gateway.gls.data.services.ServiceAvailability
 import com.gateway.gls.domain.entities.Services
 import com.google.android.gms.common.ConnectionResult
 import timber.log.Timber

@@ -1,10 +1,10 @@
-package com.gateway.gls.services
+package com.gateway.gls.data.services
 
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.core.base.Resource
-import com.gateway.gls.domain.interfaces.LocationService
+import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.ServiceFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

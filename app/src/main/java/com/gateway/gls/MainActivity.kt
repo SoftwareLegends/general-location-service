@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun testGLSLibrary() {
         CoroutineScope(Dispatchers.IO).launch {
-            GLSManager.requestLocationUpdates().also {
+            GLSManager().requestLocationUpdates().also {
                 Timber.d("\nLOCATIONS: ${it.toData}\n")
             }
         }
