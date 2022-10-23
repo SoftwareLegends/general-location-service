@@ -1,8 +1,7 @@
 package com.gateway.gls.di
 
-import com.gateway.gls.data.services.ServiceAvailability
+import android.content.Context
 import com.gateway.gls.data.LocationRepositoryImpl
-import com.gateway.gls.di.GLSInitializer.applicationContext
 import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Services
 import com.gateway.gls.data.services.GoogleService
@@ -14,38 +13,31 @@ import com.google.android.gms.location.LocationServices as GoogleLocationService
 import com.huawei.hms.location.LocationServices as HuaweiLocationServices
 import com.huawei.hms.api.HuaweiApiAvailability
 
-internal object GLSModule {
-    private val googleService: GoogleService by lazy { provideGoogleService() }
-    private val huaweiService: HuaweiService by lazy { provideHuaweiService() }
+internal class GLSModule(private val context: Context) {
+    val googleService: GoogleService by lazy { provideGoogleService() }
+    val huaweiService: HuaweiService by lazy { provideHuaweiService() }
     private val googleLocationProviderClient by lazy { provideGoogleLocationProviderClient() }
     private val huaweiLocationProviderClient by lazy { provideHuaweiLocationProviderClient() }
     val googleApiAvailability: GoogleApiAvailability by lazy { GoogleApiAvailability.getInstance() }
     val huaweiApiAvailability: HuaweiApiAvailability by lazy { HuaweiApiAvailability.getInstance() }
-    val repository: LocationRepository by lazy { provideLocationRepository() }
 
     private fun provideGoogleLocationProviderClient() =
-        GoogleLocationServices.getFusedLocationProviderClient(applicationContext)
+        GoogleLocationServices.getFusedLocationProviderClient(context)
 
     private fun provideHuaweiLocationProviderClient() =
-        HuaweiLocationServices.getFusedLocationProviderClient(applicationContext)
+        HuaweiLocationServices.getFusedLocationProviderClient(context)
 
     private fun provideGoogleService() = GoogleService(
-        context = applicationContext,
+        context = context,
         locationRequest = LocationRequestProvider.Google().locationRequest,
         fusedLocationClient = googleLocationProviderClient
     )
 
     private fun provideHuaweiService() = HuaweiService(
-        context = applicationContext,
+        context = context,
         locationRequest = LocationRequestProvider.Huawei().locationRequest,
         fusedLocationClient = huaweiLocationProviderClient
     )
 
-    private fun provideLocationRepository(): LocationRepository = LocationRepositoryImpl(
-        service = when (ServiceAvailability.serviceProvider) {
-            is Services.Google -> googleService
-            is Services.Huawei -> huaweiService
-            else -> NoneService()
-        }
-    )
+
 }

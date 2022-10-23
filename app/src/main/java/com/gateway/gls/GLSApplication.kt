@@ -9,7 +9,6 @@ class GLSApplication : Application() {
         super.onCreate()
         timberConfig()
 //        GLSCrashlytics.instance
-        GLSInitializer.init(applicationContext)
     }
 
     private fun timberConfig(){

@@ -4,14 +4,16 @@ import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.gateway.core.base.Resource
-import com.gateway.gls.di.GLSModule.repository
 import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.domain.entities.Services
-import com.gateway.gls.data.services.ServiceAvailability
 import kotlinx.coroutines.flow.Flow
 
-class GLSManager : LocationRepository {
+class GLSManager(
+    private val repository: LocationRepository,
+    val serviceProvider: Services,
+    val isServicesAvailable: Boolean
+    ) : LocationRepository {
     override fun lastLocationAsFlow(): Flow<Resource<Location>> =
         repository.lastLocationAsFlow()
 
@@ -40,10 +42,4 @@ class GLSManager : LocationRepository {
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =
         repository.requestLocationSettings(resultContracts)
-
-    override val isLocationServicesAvailable: Boolean
-        get() = repository.isLocationServicesAvailable
-
-    val serviceProvider: Services
-        get() = ServiceAvailability.serviceProvider
 }

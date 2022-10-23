@@ -8,7 +8,7 @@ import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.core.base.Resource
-import com.gateway.gls.data.services.ServiceAvailability
+import com.gateway.gls.domain.entities.Services
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
@@ -42,8 +42,6 @@ internal class LocationRepositoryImpl(private val service: LocationService) : Lo
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =
         service.requestLocationSettings(resultContracts = resultContracts)
-
-    override val isLocationServicesAvailable: Boolean = ServiceAvailability.isServicesAvailable
 
     private fun <T> wrapWithFlow(block: suspend () -> Resource<T>): Flow<Resource<T>> = flow {
         emit(Resource.Loading)

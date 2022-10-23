@@ -2,9 +2,9 @@ package com.gateway.gls
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.gateway.gls.di.GLSInitializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -16,8 +16,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun testGLSLibrary() {
+        val glsManager = GLSInitializer(applicationContext).init()
+
         CoroutineScope(Dispatchers.IO).launch {
-            GLSManager().requestLocationUpdates().also {
+            glsManager.requestLocationUpdates().also {
                 Timber.d("\nLOCATIONS: ${it.toData}\n")
             }
         }

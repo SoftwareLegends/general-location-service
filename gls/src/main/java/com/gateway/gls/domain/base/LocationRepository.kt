@@ -8,7 +8,7 @@ import com.gateway.core.base.Resource
 import com.gateway.gls.utils.LocationRequestDefaults
 import kotlinx.coroutines.flow.Flow
 
-internal interface LocationRepository {
+interface LocationRepository {
     fun lastLocationAsFlow(): Flow<Resource<Location>>
     suspend fun lastLocation(): Resource<Location>
 
@@ -25,6 +25,4 @@ internal interface LocationRepository {
     )
 
     fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)
-
-    val isLocationServicesAvailable: Boolean
 }

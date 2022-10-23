@@ -1,36 +1,43 @@
 package com.gateway.gls.di
 
 import android.content.Context
-import com.gateway.gls.data.services.ServiceAvailability
+import com.gateway.gls.GLSManager
+import com.gateway.gls.data.LocationRepositoryImpl
+import com.gateway.gls.data.services.NoneService
+import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Services
 import com.google.android.gms.common.ConnectionResult
 import timber.log.Timber
 
-object GLSInitializer {
-    @Volatile
-    internal lateinit var applicationContext: Context
+class GLSInitializer(private val applicationContext: Context) {
+    private var serviceProvider: Services = Services.None
+    private var isServicesAvailable: Boolean = false
+    private var module: GLSModule
+
+    init { module = GLSModule(context = applicationContext) }
 
     /**
      * This function should called in MainActivity or an Application instance.
-
      * to provide an applicationContext instance for the service.
      *
      * @author Ahmed Mones
      */
-    fun init(applicationContext: Context) {
-        if (this::applicationContext.isInitialized.not()) {
-            synchronized(applicationContext) { this.applicationContext = applicationContext }
-            prepareAvailability(context = applicationContext)
-        }
+    fun init(): GLSManager {
+        prepareAvailability(module = module)
+        return GLSManager(
+            repository = provideLocationRepository(module),
+            serviceProvider = serviceProvider,
+            isServicesAvailable = isServicesAvailable
+        )
     }
 
-    private fun prepareAvailability(context: Context) {
-        ServiceAvailability.isServicesAvailable = with(GLSModule){
+    private fun prepareAvailability(module: GLSModule) {
+        isServicesAvailable = with(module) {
             when (ConnectionResult.SUCCESS) {
-                googleApiAvailability.isGooglePlayServicesAvailable(context) -> setServiceProvider(
+                googleApiAvailability.isGooglePlayServicesAvailable(applicationContext) -> setServiceProvider(
                     service = Services.Google
                 )
-                huaweiApiAvailability.isHuaweiMobileServicesAvailable(context) -> setServiceProvider(
+                huaweiApiAvailability.isHuaweiMobileServicesAvailable(applicationContext) -> setServiceProvider(
                     service = Services.Huawei
                 )
                 else -> false
@@ -40,6 +47,15 @@ object GLSInitializer {
 
     private fun setServiceProvider(service: Services) = true.also {
         Timber.d(service::class.java.name.substringAfter('$'))
-        ServiceAvailability.serviceProvider = service
+        serviceProvider = service
     }
+
+    private fun provideLocationRepository(module: GLSModule): LocationRepository =
+        LocationRepositoryImpl(
+            service = when (serviceProvider) {
+                is Services.Google -> module.googleService
+                is Services.Huawei -> module.huaweiService
+                else -> NoneService()
+            }
+        )
 }
