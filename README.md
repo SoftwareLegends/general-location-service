@@ -42,17 +42,20 @@ class MainActivity : AppCompatActivity() {
         ...
 	
 	// initialize service 
-	
-	GLSInitializer.init(applicationContext)
-	val glsManager = GLSManager()
-	// Use Repository
-	
+	val glsManager = GLSInitializer.init(applicationContext)
+
 	CoroutineScope(Dispatchers.IO).launch{
             with(glsManager) {
-                Log.d("TESTING", "is Location Service Available: $isLocationServicesAvailable")
-                getLastLocationAsFlow().collect {
+                Log.d("TESTING", "is Google Or Huawei Service Available: $isServicesAvailable")
+		
+		// Collect location updates as flow
+                requestLocationUpdatesAsFlow().collect {
                     // Do Something
                 }
+		
+		// OR use it as suspend function
+		val locations = requestLocationUpdatesw()
+		Log.d("TESTING", "Locations: $locations")
             }
         }
     }
