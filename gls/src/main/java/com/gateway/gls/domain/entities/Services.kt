@@ -1,4 +1,4 @@
-package com.gateway.gls.domain.models
+package com.gateway.gls.domain.entities
 
 sealed class Services {
     object Google : Services()

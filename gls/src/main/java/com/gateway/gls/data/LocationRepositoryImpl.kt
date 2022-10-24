@@ -4,18 +4,19 @@ import android.annotation.SuppressLint
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.interfaces.LocationRepository
-import com.gateway.gls.domain.interfaces.LocationService
-import com.gateway.gls.domain.models.Priority
-import com.gateway.gls.domain.models.Resource
+import com.gateway.gls.domain.base.LocationRepository
+import com.gateway.gls.domain.base.LocationService
+import com.gateway.gls.domain.entities.Priority
+import com.gateway.core.base.Resource
+import com.gateway.gls.domain.entities.Services
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 @SuppressLint("MissingPermission")
-class LocationRepositoryImpl(private val service: LocationService) : LocationRepository {
-    override fun lastLocationAsFlow(): Flow<Resource<Location>> = wrapWithFlow(service::lastLocation)
+internal class LocationRepositoryImpl(private val service: LocationService) : LocationRepository {
+    override fun lastLocationAsFlow(): Flow<Resource<Location>> = wrapWithFlow(service::getLastLocation)
 
-    override suspend fun lastLocation(): Resource<Location> = service.lastLocation()
+    override suspend fun lastLocation(): Resource<Location> = service.getLastLocation()
 
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
         service.requestLocationUpdatesAsFlow()
@@ -25,22 +26,22 @@ class LocationRepositoryImpl(private val service: LocationService) : LocationRep
 
     override fun configureLocationRequest(
         priority: Priority,
-        interval: Long,
-        fastestInterval: Long,
-        numUpdates: Int
+        intervalMillis: Long,
+        minUpdateIntervalMillis: Long,
+        maxUpdates: Int,
+        maxUpdateDelayMillis: Long
     ) {
         service.configureLocationRequest(
             priority = priority.value,
-            interval = interval,
-            numUpdates = numUpdates,
-            fastestInterval = fastestInterval
+            intervalMillis = intervalMillis,
+            maxUpdates = maxUpdates,
+            minUpdateIntervalMillis = minUpdateIntervalMillis,
+            maxUpdateDelayMillis = maxUpdateDelayMillis
         )
     }
 
-    override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =
-        service.locationSettings(resultContracts = resultContracts)
-
-    override val isLocationServicesAvailable: Boolean = GLServiceAvailability.isServicesAvailable
+    override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =
+        service.requestLocationSettings(resultContracts = resultContracts)
 
     private fun <T> wrapWithFlow(block: suspend () -> Resource<T>): Flow<Resource<T>> = flow {
         emit(Resource.Loading)
