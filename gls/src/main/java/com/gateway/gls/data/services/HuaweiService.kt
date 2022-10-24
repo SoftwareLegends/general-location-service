@@ -1,4 +1,4 @@
-package com.gateway.gls.data
+package com.gateway.gls.data.services
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -7,63 +7,54 @@ import android.location.Location
 import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.gls.domain.interfaces.LocationService
-import com.gateway.gls.domain.models.Resource
-import com.gateway.gls.domain.models.ServiceFailure
+import com.gateway.core.base.Resource
+import com.gateway.gls.data.LocationRequestProvider
+import com.gateway.gls.domain.entities.ServiceFailure
+import com.gateway.gls.domain.base.LocationService
+import com.gateway.gls.utils.LocationRequestDefaults
+import com.gateway.gls.utils.extenstions.await
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.huawei.hms.common.ResolvableApiException
+import com.huawei.hms.location.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
-class GoogleService(
+internal class HuaweiService(
     private val context: Context,
     private val fusedLocationClient: FusedLocationProviderClient,
-    private val locationRequest: LocationRequest
+    private var locationRequest: LocationRequest
 ) : LocationService {
-    override suspend fun lastLocation(): Resource<Location> = safeCall {
+    override suspend fun getLastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()
         getLocationResult(context = context, location = location)
     }
 
-    override fun configureLocationRequest(
-        priority: Int,
-        interval: Long,
-        fastestInterval: Long,
-        numUpdates: Int
-    ) {
-        locationRequest.apply {
-            this.priority = priority
-            this.interval = interval
-            this.fastestInterval = fastestInterval
-            this.numUpdates = numUpdates
-        }
-    }
-
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
+        trySend(Resource.Loading)
+
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                result.locations.forEach { location ->
-                    trySendBlocking(Resource.Success(data = location))
-                        .onFailure {
-                            trySendBlocking(
-                                Resource.Fail(
-                                    error = ServiceFailure.UnknownError(
-                                        message = it?.message
-                                    )
+                val location = result.locations.minBy { it.accuracy }
+
+                trySendBlocking(Resource.Success(data = location))
+                    .onFailure {
+                        trySendBlocking(
+                            Resource.Fail(
+                                error = ServiceFailure.UnknownError(
+                                    message = it?.message
                                 )
                             )
-                        }
-                }
+                        )
+                    }
             }
         }
+
         if (context.isGpsProviderEnabled().not())
             trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
         else
@@ -82,27 +73,24 @@ class GoogleService(
 
         var isRunning: Boolean = true
         var numUpdates: Int = locationRequest.numUpdates
+        var currentUpdate: Int = numUpdates
+        var safeCounter = LocationRequestDefaults.SAFE_COUNTER
+
 
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                runCatching {
-                    results.addAll(result.locations)
-                    status = Resource.Success(data = results)
-                }.onFailure {
-                    status = Resource.Fail(
-                        error = ServiceFailure.UnknownError(
-                            message = it.message
-                        )
-                    )
-                }
+                val location = result.locations.minBy { it.accuracy }
+                results.add(location)
+                status = Resource.Success(data = results)
 
                 numUpdates--
 
                 if (numUpdates == 0)
                     isRunning = false
+
+                currentUpdate = numUpdates
             }
         }
-
 
         if (context.isGpsProviderEnabled().not())
             status = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
@@ -114,14 +102,35 @@ class GoogleService(
             )
 
         while (isRunning) {
-            delay(locationRequest.interval)
+            delay(locationRequest.run { interval + maxWaitTime })
+
+            if (currentUpdate == numUpdates)
+                safeCounter--
+            else
+                safeCounter = LocationRequestDefaults.SAFE_COUNTER
         }
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
         return status
     }
 
-    override fun locationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
+    override fun configureLocationRequest(
+        priority: Int,
+        intervalMillis: Long,
+        minUpdateIntervalMillis: Long,
+        maxUpdates: Int,
+        maxUpdateDelayMillis: Long
+    ) {
+        locationRequest = LocationRequestProvider.Huawei(
+            priority = priority,
+            maxUpdates = maxUpdates,
+            intervalMillis = intervalMillis,
+            maxUpdateDelayMillis = maxUpdateDelayMillis,
+            minUpdateIntervalMillis = minUpdateIntervalMillis,
+        ).locationRequest
+    }
+
+    override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
         // Define a device setting client.
 
         val builder = LocationSettingsRequest.Builder()

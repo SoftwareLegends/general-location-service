@@ -2,7 +2,7 @@ package com.gateway.gls
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.gateway.gls.di.GLServiceLocator
+import com.gateway.gls.di.GLSInitializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,8 +16,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun testGLSLibrary() {
+        val glsManager = GLSInitializer(applicationContext).create()
+
         CoroutineScope(Dispatchers.IO).launch {
-            GLServiceLocator.locationRepository.requestLocationUpdates().also {
+            glsManager.requestLocationUpdates().also {
                 Timber.d("\nLOCATIONS: ${it.toData}\n")
             }
         }
