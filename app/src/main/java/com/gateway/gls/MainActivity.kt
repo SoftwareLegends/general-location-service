@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun testGLSLibrary() {
-        val glsManager = GLSInitializer(applicationContext).init()
+        val glsManager = GLSInitializer(applicationContext).create()
 
         CoroutineScope(Dispatchers.IO).launch {
             glsManager.requestLocationUpdates().also {

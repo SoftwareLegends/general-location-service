@@ -17,12 +17,10 @@ class GLSInitializer(private val applicationContext: Context) {
     init { module = GLSModule(context = applicationContext) }
 
     /**
-     * This function should called in MainActivity or an Application instance.
-     * to provide an applicationContext instance for the service.
-     *
+     * @return This function an instance of GLSManager.
      * @author Ahmed Mones
      */
-    fun init(): GLSManager {
+    fun create(): GLSManager {
         prepareAvailability(module = module)
         return GLSManager(
             repository = provideLocationRepository(module),
