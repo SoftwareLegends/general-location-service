@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         ...
 	
 	// initialize service 
-	val glsManager = GLSInitializer(applicationContext).init()
+	val glsManager = GLSInitializer(applicationContext).create()
 
 	CoroutineScope(Dispatchers.IO).launch{
             with(glsManager) {
