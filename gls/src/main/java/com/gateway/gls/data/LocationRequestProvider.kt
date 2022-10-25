@@ -14,13 +14,24 @@ internal sealed class LocationRequestProvider<out T> {
         val maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
         val maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
     ) : LocationRequestProvider<LocationRequestGoogle>() {
-        val locationRequest: LocationRequestGoogle = LocationRequestGoogle
-            .Builder(intervalMillis)
-            .setPriority(priority)
-            .setMinUpdateIntervalMillis(minUpdateIntervalMillis)
-            .setMaxUpdates(maxUpdates)
-            .setMaxUpdateDelayMillis(maxUpdateDelayMillis)
-            .build()
+        val locationRequest: LocationRequestGoogle = LocationRequestGoogle.create().apply {
+            priority = priority
+            interval = intervalMillis
+            fastestInterval = minUpdateIntervalMillis
+            numUpdates = maxUpdates
+            maxWaitTime = maxUpdateDelayMillis
+        }
+
+        /** TODO: gms_location_version = '21.0.0' new implementation
+         * But LocationSettingsRequest not working on xiaomi
+        */
+//        val locationRequest: LocationRequestGoogle = LocationRequestGoogle
+//            .Builder(intervalMillis)
+//            .setPriority(priority)
+//            .setMinUpdateIntervalMillis(minUpdateIntervalMillis)
+//            .setMaxUpdates(maxUpdates)
+//            .setMaxUpdateDelayMillis(maxUpdateDelayMillis)
+//            .build()
     }
 
     class Huawei(

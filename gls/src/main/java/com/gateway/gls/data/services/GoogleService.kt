@@ -88,7 +88,7 @@ internal class GoogleService(
         var status: Resource<List<Location>> = Resource.Init
 
         var isRunning: Boolean = true
-        var numUpdates: Int = locationRequest.maxUpdates
+        var numUpdates: Int = locationRequest.numUpdates
         var currentUpdate: Int = numUpdates
         var safeCounter = LocationRequestDefaults.SAFE_COUNTER
 
@@ -117,7 +117,7 @@ internal class GoogleService(
             )
 
         while (isRunning && safeCounter != 0) {
-            delay(locationRequest.run { intervalMillis + maxUpdateDelayMillis })
+            delay(locationRequest.run { interval + maxWaitTime })
 
             if (currentUpdate == numUpdates)
                 safeCounter--
