@@ -35,7 +35,7 @@ dependencies {
 
 ```kotlin
 ...
-import com.gateway.gms.di.GMServiceLocator
+import com.gateway.gls.di.GLSInitializer
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
