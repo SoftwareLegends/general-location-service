@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.gateway.gls.di.GLSInitializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -30,8 +31,9 @@ class MainActivity : ComponentActivity() {
         glsManager.requestLocationSettings(result)
 
         CoroutineScope(Dispatchers.IO).launch {
-            glsManager.requestLocationUpdates().also {
-                Timber.d("\nLOCATIONS: ${it.toData}\n")
+            glsManager.requestLocationUpdatesAsFlow()
+                .collect {
+                Timber.d("\nLOCATIONS: ${it.toData?.accuracy}\n")
             }
         }
     }
