@@ -3,8 +3,8 @@ package com.gateway.gls.domain.base
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
+import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.entities.Priority
-import com.gateway.core.base.Resource
 import com.gateway.gls.utils.LocationRequestDefaults
 import kotlinx.coroutines.flow.Flow
 

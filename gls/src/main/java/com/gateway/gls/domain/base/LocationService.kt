@@ -6,7 +6,7 @@ import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.annotation.RequiresPermission
-import com.gateway.core.base.Resource
+import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
@@ -22,8 +22,8 @@ internal interface LocationService {
     )
     suspend fun getLastLocation(): Resource<Location>
 
-    fun requestLocationUpdatesAsFlow() : Flow<Resource<Location>>
-    suspend fun requestLocationUpdates() : Resource<List<Location>>
+    fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>>
+    suspend fun requestLocationUpdates(): Resource<List<Location>>
 
     fun configureLocationRequest(
         priority: Int = Priority.PRIORITY_HIGH_ACCURACY,

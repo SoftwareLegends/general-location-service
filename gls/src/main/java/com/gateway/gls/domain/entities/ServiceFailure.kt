@@ -1,6 +1,6 @@
 package com.gateway.gls.domain.entities
 
-import com.gateway.core.exceptions.base.BaseException
+import com.altaie.prettycode.core.exceptions.base.BaseException
 
 sealed class ServiceFailure(
     override val message: String?,

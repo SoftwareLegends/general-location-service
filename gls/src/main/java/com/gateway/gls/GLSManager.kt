@@ -3,7 +3,7 @@ package com.gateway.gls
 import android.location.Location
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import com.gateway.core.base.Resource
+import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.domain.entities.Services
