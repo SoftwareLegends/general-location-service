@@ -108,7 +108,7 @@ internal class GoogleService(
         }
 
         if (context.isGpsProviderEnabled().not())
-            status = Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
+            return Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
         else
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
