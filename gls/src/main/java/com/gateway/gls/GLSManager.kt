@@ -26,6 +26,8 @@ class GLSManager(
     override suspend fun requestLocationUpdates(): Resource<List<Location>> =
         repository.requestLocationUpdates()
 
+    override fun removeLocationUpdates() = repository.removeLocationUpdates()
+
     override fun configureLocationRequest(
         priority: Priority,
         intervalMillis: Long,

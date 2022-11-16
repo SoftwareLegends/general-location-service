@@ -16,6 +16,8 @@ interface LocationRepository {
 
     suspend fun requestLocationUpdates(): Resource<List<Location>>
 
+    fun removeLocationUpdates()
+
     fun configureLocationRequest(
         priority: Priority = Priority.HighAccuracy,
         intervalMillis: Long = LocationRequestDefaults.UPDATE_INTERVAL_MILLIS,

@@ -19,6 +19,8 @@ internal class NoneService : LocationService {
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
         flow { emit(Resource.Fail(error = ServiceFailure.LocationServiceNotFound())) }
 
+    override fun removeLocationUpdates() {}
+
     override fun configureLocationRequest(
         priority: Int,
         intervalMillis: Long,
