@@ -23,6 +23,8 @@ internal class LocationRepositoryImpl(private val service: LocationService) : Lo
     override suspend fun requestLocationUpdates(): Resource<List<Location>> =
         service.requestLocationUpdates()
 
+    override fun removeLocationUpdates() = service.removeLocationUpdates()
+
     override fun configureLocationRequest(
         priority: Priority,
         intervalMillis: Long,

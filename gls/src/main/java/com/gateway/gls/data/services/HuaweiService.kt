@@ -30,6 +30,8 @@ internal class HuaweiService(
     private val fusedLocationClient: FusedLocationProviderClient,
     private var locationRequest: LocationRequest
 ) : LocationService {
+    private lateinit var locationCallback: LocationCallback
+
     override suspend fun getLastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()
         getLocationResult(context = context, location = location)
@@ -38,7 +40,7 @@ internal class HuaweiService(
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
         trySend(Resource.Loading)
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.locations.minBy { it.accuracy }
 
@@ -77,7 +79,7 @@ internal class HuaweiService(
         var safeCounter = LocationRequestDefaults.SAFE_COUNTER
 
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.locations.minBy { it.accuracy }
                 results.add(location)
@@ -112,6 +114,11 @@ internal class HuaweiService(
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
         return status
+    }
+
+    override fun removeLocationUpdates() {
+        if (::locationCallback.isInitialized)
+            fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     override fun configureLocationRequest(

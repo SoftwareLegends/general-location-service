@@ -9,8 +9,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.data.LocationRequestProvider
-import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.domain.base.LocationService
+import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
@@ -30,6 +30,8 @@ internal class GoogleService(
     private val fusedLocationClient: FusedLocationProviderClient,
     private var locationRequest: LocationRequest
 ) : LocationService {
+    private lateinit var locationCallback: LocationCallback
+
     override suspend fun getLastLocation(): Resource<Location> = safeCall {
         val location = fusedLocationClient.lastLocation.await()
         getLocationResult(context = context, location = location)
@@ -54,7 +56,7 @@ internal class GoogleService(
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
         trySend(Resource.Loading)
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.locations.minBy { it.accuracy }
 
@@ -92,7 +94,7 @@ internal class GoogleService(
         var currentUpdate: Int = numUpdates
         var safeCounter = LocationRequestDefaults.SAFE_COUNTER
 
-        val locationCallback = object : LocationCallback() {
+        locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 val location = result.locations.minBy { it.accuracy }
                 results.add(location)
@@ -127,6 +129,11 @@ internal class GoogleService(
 
         fusedLocationClient.removeLocationUpdates(locationCallback)
         return status
+    }
+
+    override fun removeLocationUpdates() {
+        if (::locationCallback.isInitialized)
+            fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {

@@ -10,6 +10,8 @@ import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
+import com.google.android.gms.location.LocationCallback as GoogleLocationCallback
+import com.huawei.hms.location.LocationCallback as HuaweiLocationCallback
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
@@ -24,6 +26,7 @@ internal interface LocationService {
 
     fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>>
     suspend fun requestLocationUpdates(): Resource<List<Location>>
+    fun removeLocationUpdates()
 
     fun configureLocationRequest(
         priority: Int = Priority.PRIORITY_HIGH_ACCURACY,
