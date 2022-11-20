@@ -9,7 +9,6 @@ buildscript {
         hms_location_version = '6.4.0.300'
         gradle_version = '7.2.2'
         kotlin_version = '1.7.10'
-        crashlytics_version = '2.9.1'
         jvm_version = JavaVersion.VERSION_1_8
         sdk_version = 33
     }
@@ -25,9 +24,7 @@ buildscript {
         classpath "com.google.gms:google-services:$gms_service_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
-        // Add the Crashlytics Gradle plugin
-        classpath "com.google.firebase:firebase-crashlytics-gradle:$crashlytics_version"
-    }
+           }
 }
 
 plugins {
