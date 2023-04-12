@@ -2,13 +2,11 @@ package com.gateway.gls
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import com.gateway.gls.di.GLSInitializer
+import com.gateway.gls.domain.entities.Priority
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -24,17 +22,25 @@ class MainActivity : ComponentActivity() {
 
         val result = registerForActivityResult(
             ActivityResultContracts.StartIntentSenderForResult()
-        ){
+        ) {
 
         }
+        glsManager.configureLocationRequest(
+            maxUpdates = Int.MAX_VALUE,
+            intervalMillis = 1000,
+            maxUpdateDelayMillis = 1000,
+            minDistanceThreshold = 0f,
+            minUpdateIntervalMillis = 0,
+            priority = Priority.HighAccuracy
+        )
 
         glsManager.requestLocationSettings(result)
 
         CoroutineScope(Dispatchers.IO).launch {
             glsManager.requestLocationUpdatesAsFlow()
                 .collect {
-                Timber.d("\nLOCATIONS: ${it.toData?.accuracy}\n")
-            }
+                    Timber.d("\nLOCATIONS: (${it.toData?.longitude}, ${it.toData?.latitude}) -> ${it.toData?.accuracy}m\n")
+                }
         }
     }
 }

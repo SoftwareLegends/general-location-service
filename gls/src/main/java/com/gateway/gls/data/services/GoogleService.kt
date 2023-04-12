@@ -15,12 +15,15 @@ import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 
@@ -42,7 +45,8 @@ internal class GoogleService(
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) {
         locationRequest = LocationRequestProvider.Google(
             priority = priority,
@@ -50,6 +54,7 @@ internal class GoogleService(
             intervalMillis = intervalMillis,
             maxUpdateDelayMillis = maxUpdateDelayMillis,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
+            minDistanceThreshold = minDistanceThreshold
         ).locationRequest
     }
 
@@ -70,6 +75,8 @@ internal class GoogleService(
                             )
                         )
                     }
+
+                fusedLocationClient.flushLocations()
             }
         }
 
@@ -83,7 +90,8 @@ internal class GoogleService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
-    }
+    }.distinctUntilChanged()
+        .buffer(Channel.UNLIMITED)
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
         val results: MutableList<Location> = mutableListOf()

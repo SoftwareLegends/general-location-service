@@ -30,14 +30,16 @@ internal class LocationRepositoryImpl(private val service: LocationService) : Lo
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) {
         service.configureLocationRequest(
             priority = priority.value,
             intervalMillis = intervalMillis,
             maxUpdates = maxUpdates,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
-            maxUpdateDelayMillis = maxUpdateDelayMillis
+            maxUpdateDelayMillis = maxUpdateDelayMillis,
+            minDistanceThreshold = minDistanceThreshold
         )
     }
 

@@ -22,11 +22,11 @@ class GLSInitializer(private val applicationContext: Context) {
      */
     fun create(): GLSManager {
         prepareAvailability(module = module)
-        return GLSManager(
+        return object: GLSManager(
             repository = provideLocationRepository(module),
             serviceProvider = serviceProvider,
             isServicesAvailable = isServicesAvailable
-        )
+        ){}
     }
 
     private fun prepareAvailability(module: GLSModule) {

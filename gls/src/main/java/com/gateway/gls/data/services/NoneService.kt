@@ -26,7 +26,8 @@ internal class NoneService : LocationService {
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) {}
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {}

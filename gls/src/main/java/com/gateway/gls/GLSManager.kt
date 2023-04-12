@@ -9,7 +9,7 @@ import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.domain.entities.Services
 import kotlinx.coroutines.flow.Flow
 
-class GLSManager(
+abstract class GLSManager(
     private val repository: LocationRepository,
     val serviceProvider: Services,
     val isServicesAvailable: Boolean
@@ -33,13 +33,15 @@ class GLSManager(
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) = repository.configureLocationRequest(
         priority = priority,
         intervalMillis = intervalMillis,
         minUpdateIntervalMillis = minUpdateIntervalMillis,
         maxUpdates = maxUpdates,
-        maxUpdateDelayMillis = maxUpdateDelayMillis
+        maxUpdateDelayMillis = maxUpdateDelayMillis,
+        minDistanceThreshold = minDistanceThreshold
     )
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =

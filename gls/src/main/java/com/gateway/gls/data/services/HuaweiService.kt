@@ -16,12 +16,15 @@ import com.gateway.gls.utils.extenstions.await
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.huawei.hms.common.ResolvableApiException
 import com.huawei.hms.location.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import timber.log.Timber
 
 @SuppressLint("MissingPermission")
@@ -54,6 +57,8 @@ internal class HuaweiService(
                             )
                         )
                     }
+
+                fusedLocationClient.flushLocations()
             }
         }
 
@@ -67,7 +72,8 @@ internal class HuaweiService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
-    }
+    }.distinctUntilChanged()
+        .buffer(Channel.UNLIMITED)
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
         val results: MutableList<Location> = mutableListOf()
@@ -126,7 +132,8 @@ internal class HuaweiService(
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) {
         locationRequest = LocationRequestProvider.Huawei(
             priority = priority,
@@ -134,6 +141,7 @@ internal class HuaweiService(
             intervalMillis = intervalMillis,
             maxUpdateDelayMillis = maxUpdateDelayMillis,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
+            minDistanceThreshold = minDistanceThreshold
         ).locationRequest
     }
 
