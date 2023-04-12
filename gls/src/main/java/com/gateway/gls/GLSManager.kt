@@ -33,13 +33,15 @@ class GLSManager(
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minDistanceThreshold: Float,
     ) = repository.configureLocationRequest(
         priority = priority,
         intervalMillis = intervalMillis,
         minUpdateIntervalMillis = minUpdateIntervalMillis,
         maxUpdates = maxUpdates,
-        maxUpdateDelayMillis = maxUpdateDelayMillis
+        maxUpdateDelayMillis = maxUpdateDelayMillis,
+        minDistanceThreshold = minDistanceThreshold
     )
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) =

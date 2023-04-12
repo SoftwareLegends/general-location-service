@@ -34,6 +34,7 @@ internal interface LocationService {
         minUpdateIntervalMillis: Long = LocationRequestDefaults.MIN_UPDATE_INTERVAL_MILLIS,
         maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
         maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
+        minDistanceThreshold: Float = LocationRequestDefaults.MIN_DISTANCE_THRESHOLD,
     )
 
     fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)

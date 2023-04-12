@@ -13,6 +13,7 @@ internal sealed class LocationRequestProvider<out T> {
         val minUpdateIntervalMillis: Long = LocationRequestDefaults.MIN_UPDATE_INTERVAL_MILLIS,
         val maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
         val maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
+        val minDistanceThreshold: Float = LocationRequestDefaults.MIN_DISTANCE_THRESHOLD,
     ) : LocationRequestProvider<LocationRequestGoogle>() {
         val locationRequest: LocationRequestGoogle = LocationRequestGoogle.create().apply {
             priority = priority
@@ -20,6 +21,7 @@ internal sealed class LocationRequestProvider<out T> {
             fastestInterval = minUpdateIntervalMillis
             numUpdates = maxUpdates
             maxWaitTime = maxUpdateDelayMillis
+            smallestDisplacement = minDistanceThreshold
         }
 
         /** TODO: gms_location_version = '21.0.0' new implementation
@@ -40,13 +42,15 @@ internal sealed class LocationRequestProvider<out T> {
         val minUpdateIntervalMillis: Long = LocationRequestDefaults.MIN_UPDATE_INTERVAL_MILLIS,
         val maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
         val maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
-    ) : LocationRequestProvider<LocationRequestHuawei>() {
+        val minDistanceThreshold: Float = LocationRequestDefaults.MIN_DISTANCE_THRESHOLD,
+        ) : LocationRequestProvider<LocationRequestHuawei>() {
         val locationRequest: LocationRequestHuawei = LocationRequestHuawei.create().apply {
             priority = priority
             interval = intervalMillis
             fastestInterval = minUpdateIntervalMillis
             numUpdates = maxUpdates
             maxWaitTime = maxUpdateDelayMillis
+            smallestDisplacement = minDistanceThreshold
         }
     }
 }
