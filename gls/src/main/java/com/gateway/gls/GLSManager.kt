@@ -9,7 +9,7 @@ import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.domain.entities.Services
 import kotlinx.coroutines.flow.Flow
 
-class GLSManager(
+abstract class GLSManager(
     private val repository: LocationRepository,
     val serviceProvider: Services,
     val isServicesAvailable: Boolean
