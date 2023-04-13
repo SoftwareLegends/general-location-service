@@ -10,8 +10,6 @@ import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
-import com.google.android.gms.location.LocationCallback as GoogleLocationCallback
-import com.huawei.hms.location.LocationCallback as HuaweiLocationCallback
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
@@ -34,7 +32,7 @@ internal interface LocationService {
         minUpdateIntervalMillis: Long = LocationRequestDefaults.MIN_UPDATE_INTERVAL_MILLIS,
         maxUpdates: Int = LocationRequestDefaults.MAX_UPDATES,
         maxUpdateDelayMillis: Long = LocationRequestDefaults.MAX_UPDATE_DELAY_MILLIS,
-        minDistanceThreshold: Float = LocationRequestDefaults.MIN_DISTANCE_THRESHOLD,
+        minUpdateDistanceMeters: Float = LocationRequestDefaults.MIN_UPDATE_DISTANCE_METERS,
     )
 
     fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>)

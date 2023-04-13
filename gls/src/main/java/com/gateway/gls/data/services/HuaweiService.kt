@@ -13,6 +13,7 @@ import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.utils.LocationRequestDefaults
 import com.gateway.gls.utils.extenstions.await
+import com.gateway.gls.utils.extenstions.isEqual
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.huawei.hms.common.ResolvableApiException
 import com.huawei.hms.location.*
@@ -57,8 +58,6 @@ internal class HuaweiService(
                             )
                         )
                     }
-
-                fusedLocationClient.flushLocations()
             }
         }
 
@@ -72,8 +71,9 @@ internal class HuaweiService(
             )
 
         awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
-    }.distinctUntilChanged()
-        .buffer(Channel.UNLIMITED)
+    }.distinctUntilChanged { old, new ->
+        old.toData.isEqual(new.toData)
+    }.buffer(Channel.UNLIMITED)
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
         val results: MutableList<Location> = mutableListOf()
@@ -133,7 +133,7 @@ internal class HuaweiService(
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
         maxUpdateDelayMillis: Long,
-        minDistanceThreshold: Float,
+        minUpdateDistanceMeters: Float,
     ) {
         locationRequest = LocationRequestProvider.Huawei(
             priority = priority,
@@ -141,7 +141,7 @@ internal class HuaweiService(
             intervalMillis = intervalMillis,
             maxUpdateDelayMillis = maxUpdateDelayMillis,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
-            minDistanceThreshold = minDistanceThreshold
+            minUpdateDistanceMeters = minUpdateDistanceMeters
         ).locationRequest
     }
 

@@ -12,6 +12,7 @@ import com.gateway.gls.data.LocationRequestProvider
 import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.LocationRequestDefaults
+import com.gateway.gls.utils.extenstions.isEqual
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -46,7 +47,7 @@ internal class GoogleService(
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
         maxUpdateDelayMillis: Long,
-        minDistanceThreshold: Float,
+        minUpdateDistanceMeters: Float,
     ) {
         locationRequest = LocationRequestProvider.Google(
             priority = priority,
@@ -54,44 +55,44 @@ internal class GoogleService(
             intervalMillis = intervalMillis,
             maxUpdateDelayMillis = maxUpdateDelayMillis,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
-            minDistanceThreshold = minDistanceThreshold
+            minUpdateDistanceMeters = minUpdateDistanceMeters
         ).locationRequest
     }
 
-    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> = callbackFlow {
-        trySend(Resource.Loading)
+    override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
+        callbackFlow<Resource<Location>> {
+            trySend(Resource.Loading)
+            locationCallback = object : LocationCallback() {
+                override fun onLocationResult(result: LocationResult) {
+                    super.onLocationResult(result)
+                    val location = result.locations.minBy { it.accuracy }
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                val location = result.locations.minBy { it.accuracy }
-
-                trySendBlocking(Resource.Success(data = location))
-                    .onFailure {
-                        trySendBlocking(
-                            Resource.Fail(
-                                error = ServiceFailure.UnknownError(
-                                    message = it?.message
+                    trySendBlocking(Resource.Success(data = location))
+                        .onFailure {
+                            trySendBlocking(
+                                Resource.Fail(
+                                    error = ServiceFailure.UnknownError(
+                                        message = it?.message
+                                    )
                                 )
                             )
-                        )
-                    }
-
-                fusedLocationClient.flushLocations()
+                        }
+                }
             }
-        }
 
-        if (context.isGpsProviderEnabled().not())
-            trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
-        else
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
+            if (context.isGpsProviderEnabled().not())
+                trySend(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
+            else
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
 
-        awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
-    }.distinctUntilChanged()
-        .buffer(Channel.UNLIMITED)
+            awaitClose { fusedLocationClient.removeLocationUpdates(locationCallback) }
+        }.distinctUntilChanged { old, new ->
+            old.toData.isEqual(new.toData)
+        }.buffer(Channel.UNLIMITED)
 
     override suspend fun requestLocationUpdates(): Resource<List<Location>> {
         val results: MutableList<Location> = mutableListOf()
