@@ -13,6 +13,7 @@ import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
 import com.google.android.gms.location.Priority
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
+import kotlin.time.Duration
 
 
 internal interface LocationService {
@@ -23,9 +24,16 @@ internal interface LocationService {
     suspend fun getLastLocation(): Resource<Location>
 
     fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>>
-    suspend fun requestLocationUpdates(): Resource<List<Location>>
+    suspend fun requestLocationUpdates(timeout: Duration = LocationRequestDefaults.UPDATES_TIMEOUT): Resource<List<Location>>
     fun removeLocationUpdates()
 
+    /**
+     * @param maxUpdates numUpdates
+     * @param intervalMillis interval
+     * @param minUpdateIntervalMillis fastestInterval
+     * @param maxUpdateDelayMillis maxWaitTime
+     * @param minUpdateDistanceMeters smallestDisplacement
+     * */
     fun configureLocationRequest(
         priority: Int = Priority.PRIORITY_HIGH_ACCURACY,
         intervalMillis: Long = LocationRequestDefaults.UPDATE_INTERVAL_MILLIS,

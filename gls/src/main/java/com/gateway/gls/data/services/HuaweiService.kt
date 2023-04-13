@@ -2,16 +2,15 @@ package com.gateway.gls.data.services
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.IntentSender
 import android.location.Location
 import android.os.Looper
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import com.altaie.prettycode.core.base.Resource
+import com.altaie.prettycode.core.mapper.toUnKnownError
 import com.gateway.gls.data.LocationRequestProvider
-import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.domain.base.LocationService
-import com.gateway.gls.utils.LocationRequestDefaults
+import com.gateway.gls.domain.entities.ServiceFailure
 import com.gateway.gls.utils.extenstions.await
 import com.gateway.gls.utils.extenstions.isEqual
 import com.gateway.gls.utils.extenstions.isGpsProviderEnabled
@@ -21,12 +20,15 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.time.Duration
 
 @SuppressLint("MissingPermission")
 internal class HuaweiService(
@@ -59,6 +61,13 @@ internal class HuaweiService(
                         )
                     }
             }
+
+            override fun onLocationAvailability(availability: LocationAvailability) {
+                if (availability.isLocationAvailable.not()) {
+                    fusedLocationClient.removeLocationUpdates(this)
+                    trySend(Resource.Fail(error = ServiceFailure.LocationServiceNotFound()))
+                }
+            }
         }
 
         if (context.isGpsProviderEnabled().not())
@@ -75,52 +84,45 @@ internal class HuaweiService(
         old.toData.isEqual(new.toData)
     }.buffer(Channel.UNLIMITED)
 
-    override suspend fun requestLocationUpdates(): Resource<List<Location>> {
-        val results: MutableList<Location> = mutableListOf()
-        var status: Resource<List<Location>> = Resource.Init
+    override suspend fun requestLocationUpdates(timeout: Duration): Resource<List<Location>> =
+        withTimeout(timeout) {
+            suspendCancellableCoroutine { continuation ->
+                val locations: MutableList<Location> = mutableListOf()
 
-        var isRunning: Boolean = true
-        var numUpdates: Int = locationRequest.numUpdates
-        var currentUpdate: Int = numUpdates
-        var safeCounter = LocationRequestDefaults.SAFE_COUNTER
+                locationCallback = object : LocationCallback() {
+                    override fun onLocationResult(result: LocationResult) {
+                        val location = result.locations.minBy { it.accuracy }
+                        locations.add(location)
+                        if (locations.size >= locationRequest.numUpdates) {
+                            fusedLocationClient.removeLocationUpdates(this)
+                            continuation.resume(Resource.Success(data = locations))
+                        }
+                    }
 
+                    override fun onLocationAvailability(availability: LocationAvailability) {
+                        if (availability.isLocationAvailable.not()) {
+                            fusedLocationClient.removeLocationUpdates(this)
+                            continuation.resume(Resource.Fail(error = ServiceFailure.LocationServiceNotFound()))
+                        }
+                    }
+                }
 
-        locationCallback = object : LocationCallback() {
-            override fun onLocationResult(result: LocationResult) {
-                val location = result.locations.minBy { it.accuracy }
-                results.add(location)
-                status = Resource.Success(data = results)
+                runCatching {
+                    if (context.isGpsProviderEnabled().not())
+                        continuation.resume(Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled()))
+                    else
+                        fusedLocationClient.requestLocationUpdates(
+                            locationRequest,
+                            locationCallback,
+                            Looper.getMainLooper()
+                        )
+                }.onFailure { continuation.resume(Resource.Fail(error = it.toUnKnownError())) }
 
-                numUpdates--
-
-                if (numUpdates == 0)
-                    isRunning = false
-
-                currentUpdate = numUpdates
+                continuation.invokeOnCancellation {
+                    fusedLocationClient.removeLocationUpdates(locationCallback)
+                }
             }
         }
-
-        if (context.isGpsProviderEnabled().not())
-            return Resource.Fail(error = ServiceFailure.GpsProviderIsDisabled())
-        else
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
-
-        while (isRunning) {
-            delay(locationRequest.run { interval + maxWaitTime })
-
-            if (currentUpdate == numUpdates)
-                safeCounter--
-            else
-                safeCounter = LocationRequestDefaults.SAFE_COUNTER
-        }
-
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-        return status
-    }
 
     override fun removeLocationUpdates() {
         if (::locationCallback.isInitialized)
@@ -146,33 +148,30 @@ internal class HuaweiService(
     }
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {
-        // Define a device setting client.
-
         val builder = LocationSettingsRequest.Builder()
             .addLocationRequest(locationRequest)
             .setAlwaysShow(true)
 
-        // Create a settingsClient object.
-        val client = LocationServices.getSettingsClient(context)
-        val task = client.checkLocationSettings(builder.build())
-
-        task.addOnFailureListener { exception ->
-            Timber.d("Location settings request failed")
-            if (exception is ResolvableApiException) {
-                // Location settings are not satisfied, but this can be fixed
-                // by showing the user a dialog.
-                try {
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
-
-                    val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution)
-                        .build()
-                    resultContracts.launch(intentSenderRequest)
-                } catch (sendEx: IntentSender.SendIntentException) {
-                    // Ignore the error.
-                    Timber.d(sendEx.message)
-                }
+        LocationServices.getSettingsClient(context)
+            .checkLocationSettings(builder.build())
+            .addOnFailureListener { exception ->
+                handleLocationSettingsFailure(exception, resultContracts)
             }
-        }
+    }
+
+    private fun handleLocationSettingsFailure(
+        exception: Exception,
+        resultContracts: ActivityResultLauncher<IntentSenderRequest>
+    ) {
+        if (exception is ResolvableApiException)
+            runCatching {
+                val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution)
+                    .build()
+                resultContracts.launch(intentSenderRequest)
+            }.onFailure {
+                Timber.d("Failed to launch intent sender: ${it.message}")
+            }
+        else
+            Timber.d("Location settings request failed with unknown exception: ${exception.message}")
     }
 }

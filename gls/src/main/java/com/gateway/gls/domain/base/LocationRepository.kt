@@ -7,6 +7,7 @@ import com.altaie.prettycode.core.base.Resource
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.utils.LocationRequestDefaults
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration
 
 interface LocationRepository {
     fun lastLocationAsFlow(): Flow<Resource<Location>>
@@ -14,7 +15,7 @@ interface LocationRepository {
 
     fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>>
 
-    suspend fun requestLocationUpdates(): Resource<List<Location>>
+    suspend fun requestLocationUpdates(timeout: Duration = LocationRequestDefaults.UPDATES_TIMEOUT): Resource<List<Location>>
 
     fun removeLocationUpdates()
 

@@ -8,12 +8,13 @@ import com.gateway.gls.domain.base.LocationRepository
 import com.gateway.gls.domain.entities.Priority
 import com.gateway.gls.domain.entities.Services
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Duration
 
 abstract class GLSManager(
     private val repository: LocationRepository,
     val serviceProvider: Services,
     val isServicesAvailable: Boolean
-    ) : LocationRepository {
+) : LocationRepository {
     override fun lastLocationAsFlow(): Flow<Resource<Location>> =
         repository.lastLocationAsFlow()
 
@@ -23,11 +24,18 @@ abstract class GLSManager(
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
         repository.requestLocationUpdatesAsFlow()
 
-    override suspend fun requestLocationUpdates(): Resource<List<Location>> =
-        repository.requestLocationUpdates()
+    override suspend fun requestLocationUpdates(timeout: Duration): Resource<List<Location>> =
+        repository.requestLocationUpdates(timeout = timeout)
 
     override fun removeLocationUpdates() = repository.removeLocationUpdates()
 
+    /**
+     * @param maxUpdates numUpdates
+     * @param intervalMillis interval
+     * @param minUpdateIntervalMillis fastestInterval
+     * @param maxUpdateDelayMillis maxWaitTime
+     * @param minUpdateDistanceMeters smallestDisplacement
+     * */
     override fun configureLocationRequest(
         priority: Priority,
         intervalMillis: Long,
