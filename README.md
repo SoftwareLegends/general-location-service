@@ -34,7 +34,7 @@ dependencies {
 
 ```kotlin
 ...
-import gls_app.di.GLSInitializer
+import gls.di.GLSInitializer
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 // Also can configure the location request for location updates
 
 // first import Priority class
-import gls_app.domain.models.Priority
+import gls.domain.models.Priority
 
 // Then just use the `configureLocationRequest` method
 CoroutineScope(Dispatchers.IO).launch{
