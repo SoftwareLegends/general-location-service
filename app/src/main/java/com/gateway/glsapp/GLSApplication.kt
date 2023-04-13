@@ -1,7 +1,6 @@
-package com.gateway.gls
+package com.gateway.glsapp
 
 import android.app.Application
-import com.gateway.gls.di.GLSInitializer
 import timber.log.Timber
 
 class GLSApplication : Application() {
