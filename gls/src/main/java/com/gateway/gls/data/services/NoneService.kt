@@ -8,12 +8,13 @@ import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.ServiceFailure
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration
 
 internal class NoneService : LocationService {
     override suspend fun getLastLocation(): Resource<Location> =
         Resource.Fail(error = ServiceFailure.LocationServiceNotFound())
 
-    override suspend fun requestLocationUpdates(): Resource<List<Location>> =
+    override suspend fun requestLocationUpdates(timeout: Duration): Resource<List<Location>> =
         Resource.Fail(error = ServiceFailure.LocationServiceNotFound())
 
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
@@ -27,7 +28,7 @@ internal class NoneService : LocationService {
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
         maxUpdateDelayMillis: Long,
-        minDistanceThreshold: Float,
+        minUpdateDistanceMeters: Float,
     ) {}
 
     override fun requestLocationSettings(resultContracts: ActivityResultLauncher<IntentSenderRequest>) {}
