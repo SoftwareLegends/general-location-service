@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     implementation "com.jakewharton.timber:timber:$timber_version"
     implementation project(":gls")
-
+    
     // Google Maps Location Services
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
 }
