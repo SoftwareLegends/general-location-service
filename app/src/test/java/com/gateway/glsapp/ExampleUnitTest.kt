@@ -1,4 +1,4 @@
-package com.gateway.gls
+package com.gateway.glsapp
 
 import org.junit.Test
 

@@ -10,6 +10,7 @@ import com.gateway.gls.domain.base.LocationService
 import com.gateway.gls.domain.entities.Priority
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.time.Duration
 
 @SuppressLint("MissingPermission")
 internal class LocationRepositoryImpl(private val service: LocationService) : LocationRepository {
@@ -20,8 +21,8 @@ internal class LocationRepositoryImpl(private val service: LocationService) : Lo
     override fun requestLocationUpdatesAsFlow(): Flow<Resource<Location>> =
         service.requestLocationUpdatesAsFlow()
 
-    override suspend fun requestLocationUpdates(): Resource<List<Location>> =
-        service.requestLocationUpdates()
+    override suspend fun requestLocationUpdates(timeout: Duration): Resource<List<Location>> =
+        service.requestLocationUpdates(timeout = timeout)
 
     override fun removeLocationUpdates() = service.removeLocationUpdates()
 
@@ -30,14 +31,16 @@ internal class LocationRepositoryImpl(private val service: LocationService) : Lo
         intervalMillis: Long,
         minUpdateIntervalMillis: Long,
         maxUpdates: Int,
-        maxUpdateDelayMillis: Long
+        maxUpdateDelayMillis: Long,
+        minUpdateDistanceMeters: Float,
     ) {
         service.configureLocationRequest(
             priority = priority.value,
             intervalMillis = intervalMillis,
             maxUpdates = maxUpdates,
             minUpdateIntervalMillis = minUpdateIntervalMillis,
-            maxUpdateDelayMillis = maxUpdateDelayMillis
+            maxUpdateDelayMillis = maxUpdateDelayMillis,
+            minUpdateDistanceMeters = minUpdateDistanceMeters
         )
     }
 

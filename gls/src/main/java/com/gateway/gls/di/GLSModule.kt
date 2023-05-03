@@ -1,12 +1,8 @@
 package com.gateway.gls.di
 
 import android.content.Context
-import com.gateway.gls.data.LocationRepositoryImpl
-import com.gateway.gls.domain.base.LocationRepository
-import com.gateway.gls.domain.entities.Services
 import com.gateway.gls.data.services.GoogleService
 import com.gateway.gls.data.services.HuaweiService
-import com.gateway.gls.data.services.NoneService
 import com.gateway.gls.data.LocationRequestProvider
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.location.LocationServices as GoogleLocationServices
