@@ -2,13 +2,21 @@ package com.gateway.glsapp
 
 import android.graphics.Color
 import android.os.Bundle
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.pm.PackageManager
+import android.location.Location
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.gateway.gls.di.GLSInitializer
 import com.gateway.gls.domain.entities.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
+import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.PolylineOptions
 import kotlinx.coroutines.CoroutineScope
@@ -18,16 +26,18 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), GoogleMap.OnMyLocationButtonClickListener,
+    GoogleMap.OnMyLocationClickListener, OnMapReadyCallback {
     private var map: GoogleMap? = null
     private lateinit var mapView: MapView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        requestPermissions()
         mapView = findViewById(R.id.mapView)
         mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync { map = it}
+        mapView.getMapAsync { map = it }
         testGLSLibrary()
     }
 
@@ -36,7 +46,7 @@ class MainActivity : ComponentActivity() {
             map?.animateCamera(
                 CameraUpdateFactory.newLatLngZoom(
                     pathPoint.last(),
-                    17.5f
+                    16.5f
                 )
             )
         }
@@ -81,8 +91,8 @@ class MainActivity : ComponentActivity() {
                         positions.add(pos)
                     }
 
-                    withContext(Dispatchers.Main){ addLatestPolyline(positions) }
-                    withContext(Dispatchers.Main){ moveCameraToUser(positions) }
+                    withContext(Dispatchers.Main) { addLatestPolyline(positions) }
+                    withContext(Dispatchers.Main) { moveCameraToUser(positions) }
                     Timber.d("\nLOCATIONS: (${resource.toData?.longitude}, ${resource.toData?.latitude}) -> ${resource.toData?.accuracy}m\n")
                 }
         }
@@ -121,5 +131,51 @@ class MainActivity : ComponentActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView.onSaveInstanceState(outState)
+    }
+
+    private fun requestPermissions() {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ), 100
+        )
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        map?.apply {
+            isMyLocationEnabled = true
+            isBuildingsEnabled = true
+            isIndoorEnabled = true
+            isTrafficEnabled = true
+        }
+        googleMap.setOnMyLocationButtonClickListener(this)
+        googleMap.setOnMyLocationClickListener(this)
+    }
+
+    override fun onMyLocationButtonClick(): Boolean {
+        Toast.makeText(this, "MyLocation button clicked", Toast.LENGTH_SHORT)
+            .show()
+        // Return false so that we don't consume the event and the default behavior still occurs
+        // (the camera animates to the user's current position).
+        return false
+    }
+
+    override fun onMyLocationClick(location: Location) {
+        Toast.makeText(this, "Current location:\n$location", Toast.LENGTH_LONG)
+            .show()
     }
 }

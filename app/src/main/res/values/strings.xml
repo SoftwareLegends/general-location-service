@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">General Location Service Library</string>
+    <string name="map_api_key">AIzaSyD2cuom9RdRHK04VTP8wltYqT2GXfcvLVw</string>
 </resources>
