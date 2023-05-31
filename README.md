@@ -1,4 +1,4 @@
-[![](https://jitpack.io/v/sotware-supremacy/general-location-service.svg)](https://jitpack.io/#sotware-supremacy/general-location-service)
+[![](https://jitpack.io/v/GatewayLegends/general-location-service.svg)](https://jitpack.io/#GatewayLegends/general-location-service)
 
 # General Location Service (GLS)
 > **for Google & Huawei**
@@ -21,7 +21,7 @@ Step 2. Add the dependency
 
 ```gradle
 dependencies {
-	        implementation 'com.github.sotware-supremacy:general-location-service:<VERSION>'
+	        implementation 'com.github.GatewayLegends:general-location-service:<VERSION>'
 }
 ```
 
